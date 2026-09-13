@@ -1,33 +1,17 @@
-/*
-  Smart Non-Invasive Animal Deterrent System - ESP32 Firmware (Universal LED & Siren Fix)
-  Track B: AgriTech - Problem Statement 2
-*/
-
 #include <WiFi.h>
 #include <WebServer.h>
 #include <HardwareSerial.h>
 
-// ==========================================
-// CONFIGURATION & PIN DEFINITIONS
-// ==========================================
-const char* ssid = "Wokwi-GUEST"; // Wi-Fi SSID
-const char* password = "";        // Wi-Fi Password
+const char* ssid = "Wokwi-GUEST";
+const char* password = "";
 
-// Multi-Pin LED Support (Flashes GPIO 2, GPIO 4, and GPIO 13 simultaneously)
-#define STROBE_PIN_4 4     // External Strobe LED Pin (GPIO 4)
-#define STROBE_PIN_13 13   // Secondary LED Pin (GPIO 13)
-#define STATUS_LED_2 2     // Onboard ESP32 Blue LED Pin (GPIO 2)
-#define BUZZER_PIN 18      // Loud Passive Siren Buzzer Pin (GPIO 18)
+#define STROBE_PIN 4     
+#define BUZZER_PIN 18    
+#define STATUS_LED 2    
 
-// DFPlayer Mini Serial Pins (UART2)
 #define DFPLAYER_RX 16
 #define DFPLAYER_TX 17
 
-// Active State Configuration
-// Set to true for Active-HIGH LEDs (HIGH = ON), or false for Active-LOW Relay/LED Modules (LOW = ON)
-const bool LED_ACTIVE_HIGH = true; 
-
-// Global State
 WebServer server(80);
 HardwareSerial dfPlayerSerial(2);
 
@@ -48,7 +32,7 @@ void sendDFPlayerCommand(uint8_t cmd, uint16_t arg) {
 }
 
 void playDFPlayerTrack(uint16_t trackNumber) {
-  sendDFPlayerCommand(0x06, 30); // Max Volume 30
+  sendDFPlayerCommand(0x06, 30); 
   delay(50);
   sendDFPlayerCommand(0x03, trackNumber);
   Serial.print("[DFPlayer] Playing MP3 Track #");
@@ -59,39 +43,22 @@ void stopDFPlayer() {
   sendDFPlayerCommand(0x16, 0);
 }
 
-void setLeds(bool on) {
-  uint8_t state = (on == LED_ACTIVE_HIGH) ? HIGH : LOW;
-  digitalWrite(STROBE_PIN_4, state);
-  digitalWrite(STROBE_PIN_13, state);
-  digitalWrite(STATUS_LED_2, state);
-}
-
 void setup() {
   Serial.begin(115200);
   delay(1000);
   Serial.println("\n[ESP32] Initializing Smart Farm Deterrent System...");
 
-  // Configure all LED output pins
-  pinMode(STROBE_PIN_4, OUTPUT);
-  pinMode(STROBE_PIN_13, OUTPUT);
-  pinMode(STATUS_LED_2, OUTPUT);
+  pinMode(STROBE_PIN, OUTPUT);
   pinMode(BUZZER_PIN, OUTPUT);
+  pinMode(STATUS_LED, OUTPUT);
 
-  setLeds(false);
+  digitalWrite(STROBE_PIN, LOW);
   digitalWrite(BUZZER_PIN, LOW);
-
-  // 💡 BOOT HARDWARE TEST: Flash all LEDs 4 times on power-up to confirm physical wiring!
-  Serial.println("[Hardware Test] Flashing LEDs on startup...");
-  for (int i = 0; i < 4; i++) {
-    setLeds(true);
-    delay(200);
-    setLeds(false);
-    delay(200);
-  }
+  digitalWrite(STATUS_LED, LOW);
 
   dfPlayerSerial.begin(9600, SERIAL_8N1, DFPLAYER_RX, DFPLAYER_TX);
   delay(200);
-  sendDFPlayerCommand(0x06, 30);
+  sendDFPlayerCommand(0x06, 30); // Max Volume 30
 
   Serial.print("[WiFi] Connecting to ");
   Serial.println(ssid);
@@ -102,20 +69,18 @@ void setup() {
   while (WiFi.status() != WL_CONNECTED && wifiRetries < 20) {
     delay(500);
     Serial.print(".");
-    setLeds(wifiRetries % 2 == 0);
+    digitalWrite(STATUS_LED, !digitalRead(STATUS_LED));
     wifiRetries++;
   }
 
   if (WiFi.status() == WL_CONNECTED) {
-    setLeds(true);
-    delay(500);
-    setLeds(false);
+    digitalWrite(STATUS_LED, HIGH);
     Serial.println("\n[WiFi] Connected!");
     Serial.print("[WiFi] ESP32 IP Address: ");
     Serial.println(WiFi.localIP());
   } else {
-    Serial.println("\n[WiFi Warning] Operating in SERIAL ONLY mode.");
-    setLeds(false);
+    Serial.println("\n[WiFi Warning] Connection failed. Operating in SERIAL ONLY mode.");
+    digitalWrite(STATUS_LED, LOW);
   }
 
   server.on("/trigger", HTTP_GET, handleTrigger);
@@ -160,7 +125,8 @@ void triggerDeterrent(String animal, int durationMs) {
 
 void stopDeterrent() {
   deterrentActive = false;
-  setLeds(false);
+  digitalWrite(STROBE_PIN, LOW);
+  digitalWrite(STATUS_LED, WiFi.status() == WL_CONNECTED ? HIGH : LOW);
   noTone(BUZZER_PIN);
   digitalWrite(BUZZER_PIN, LOW);
   stopDFPlayer();
@@ -175,11 +141,12 @@ void updateDeterrentState() {
     return;
   }
 
-  // Flash all LED pins (GPIO 2, 4, 13) at 150ms intervals for visible strobe effect
+  // ✅ FIX 1: Bright 150ms Strobe Flashing on STROBE_PIN (GPIO 4) & STATUS_LED (GPIO 2)
   bool flashState = (millis() / 150) % 2 == 0;
-  setLeds(flashState);
+  digitalWrite(STROBE_PIN, flashState ? HIGH : LOW);
+  digitalWrite(STATUS_LED, flashState ? HIGH : LOW);
 
-  // Loud Siren Frequencies (2200 Hz - 3400 Hz)
+  // ✅ FIX 2: Loud 95dB+ Siren Frequencies (2200 Hz - 3400 Hz Peak Resonance)
   if (currentAnimal == "pig" || currentAnimal == "boar") {
     int sweepFreq = 2400 + ((millis() / 5) % 1000);
     tone(BUZZER_PIN, sweepFreq);

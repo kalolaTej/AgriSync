@@ -20,7 +20,7 @@ from config import load_config
 from esp32_controller import ESP32Controller
 
 infer_every_n = 1
-infer_size = 540
+infer_size = 544
 display_width = 640
 
 def apply_rotation(frame, angle):

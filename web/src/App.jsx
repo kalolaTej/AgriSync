@@ -5,12 +5,6 @@ import DashboardLayout from './components/DashboardLayout'
 import Login from './pages/Login'
 import Register from './pages/Register'
 import Dashboard from './pages/Dashboard'
-import Cameras from './pages/Cameras'
-import Detections from './pages/Detections'
-import DetectionDetail from './pages/DetectionDetail'
-import Alerts from './pages/Alerts'
-import Reports from './pages/Reports'
-import Settings from './pages/Settings'
 import NotFound from './pages/NotFound'
 import MarketPrices from './pages/market/MarketPrices'
 import SaleWindow from './pages/market/SaleWindow'
@@ -37,12 +31,6 @@ export default function App() {
               <Route path="/market/buyer-profile" element={<BuyerProfile />} />
               <Route path="/market/buyer-matches" element={<BuyerMatches />} />
               <Route path="/market/logistics" element={<LogisticsSuggestion />} />
-              <Route path="/cameras" element={<Cameras />} />
-              <Route path="/detections" element={<Detections />} />
-              <Route path="/detections/:id" element={<DetectionDetail />} />
-              <Route path="/alerts" element={<Alerts />} />
-              <Route path="/reports" element={<Reports />} />
-              <Route path="/settings" element={<Settings />} />
             </Route>
           </Route>
 

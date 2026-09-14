@@ -12,6 +12,11 @@ import Alerts from './pages/Alerts'
 import Reports from './pages/Reports'
 import Settings from './pages/Settings'
 import NotFound from './pages/NotFound'
+import MarketPrices from './pages/market/MarketPrices'
+import SaleWindow from './pages/market/SaleWindow'
+import BuyerProfile from './pages/market/BuyerProfile'
+import BuyerMatches from './pages/market/BuyerMatches'
+import LogisticsSuggestion from './pages/market/LogisticsSuggestion'
 
 export default function App() {
   return (
@@ -27,6 +32,11 @@ export default function App() {
             <Route element={<DashboardLayout />}>
               <Route path="/" element={<Navigate to="/dashboard" replace />} />
               <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/market/prices" element={<MarketPrices />} />
+              <Route path="/market/sale-window" element={<SaleWindow />} />
+              <Route path="/market/buyer-profile" element={<BuyerProfile />} />
+              <Route path="/market/buyer-matches" element={<BuyerMatches />} />
+              <Route path="/market/logistics" element={<LogisticsSuggestion />} />
               <Route path="/cameras" element={<Cameras />} />
               <Route path="/detections" element={<Detections />} />
               <Route path="/detections/:id" element={<DetectionDetail />} />

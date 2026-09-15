@@ -53,7 +53,7 @@ const fetchFromGovernmentApi = async ({ crop, state, limit = 50 }) => {
   }
 
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 6000); // 6s timeout
+  const timeoutId = setTimeout(() => controller.abort(), 15000); // 15s timeout for government servers
 
   try {
     const response = await fetch(url.toString(), {
@@ -63,7 +63,11 @@ const fetchFromGovernmentApi = async ({ crop, state, limit = 50 }) => {
     clearTimeout(timeoutId);
 
     if (!response.ok) {
-      console.warn(`[agmarknet] HTTP error ${response.status} from data.gov.in`);
+      if (response.status === 429) {
+        console.warn(`[agmarknet] HTTP 429: data.gov.in rate limit reached on key (${apiKey.substring(0, 8)}...). Register your free personal key at data.gov.in and add AGMARKNET_API_KEY in backend/.env for unlimited live calls.`);
+      } else {
+        console.warn(`[agmarknet] HTTP ${response.status} from data.gov.in`);
+      }
       return [];
     }
 
@@ -157,7 +161,7 @@ const getMockFallbackPrices = ({ crop, state, market }) => {
 
 /**
  * Primary Price Retrieval Service
- * Tries Real AGMARKNET API -> Then Supabase DB -> Then Labeled Mock Fallback
+ * Tries Real AGMARKNET API -> Then Memory Cache -> Then Supabase DB -> Then Labeled Mock Fallback
  */
 const getMandiPrices = async ({ crop, state, limit = 50 }) => {
   // 1. Try real government API
@@ -171,7 +175,23 @@ const getMandiPrices = async ({ crop, state, limit = 50 }) => {
     console.warn(`[agmarknet] API retrieval failure: ${err.message}`);
   }
 
-  // 2. Try Supabase mandi_prices table
+  // 2. Try Memory Cache
+  if (memoryCache.size > 0) {
+    let cached = Array.from(memoryCache.values());
+    if (crop && crop !== 'All Crops') {
+      const cropLower = crop.toLowerCase().trim();
+      cached = cached.filter((c) => c.crop_type.toLowerCase().includes(cropLower));
+    }
+    if (state && state !== 'All States') {
+      const stateLower = state.toLowerCase().trim();
+      cached = cached.filter((c) => c.state.toLowerCase().includes(stateLower));
+    }
+    if (cached.length > 0) {
+      return cached.slice(0, limit);
+    }
+  }
+
+  // 3. Try Supabase mandi_prices table
   try {
     let dbQuery = supabase.from('mandi_prices').select('*').order('price_date', { ascending: false }).limit(limit);
     if (crop && crop !== 'All Crops') {
@@ -197,8 +217,7 @@ const getMandiPrices = async ({ crop, state, limit = 50 }) => {
   } catch (err) {
     console.debug(`[agmarknet] Database query notice: ${err.message}`);
   }
-
-  // 3. Guaranteed Mock Fallback (always labeled source: 'mock')
+  // 4. Guaranteed Mock Fallback (always labeled source: 'mock')
   return getMockFallbackPrices({ crop, state });
 };
 

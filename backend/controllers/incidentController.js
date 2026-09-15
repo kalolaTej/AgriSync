@@ -1,37 +1,12 @@
 const supabase = require('../services/supabaseClient');
+const localStore = require('../database/localStore');
 const { v4: uuidv4 } = require('crypto');
-
-// In-memory fallback store for demo reliability when database table is pending
-const memoryIncidents = [
-  {
-    id: 'inc-001',
-    farm_id: '29b9b72f-0d43-4a23-9b04-dc9e14180f2a',
-    detection_id: null,
-    crop_type: 'Wheat',
-    affected_area_estimate: '0.4 acres',
-    notes: 'Trampled wheat section near north boundary fence.',
-    reported_at: new Date(Date.now() - 3600000 * 5).toISOString(),
-    confirmed_by_farmer: true,
-  },
-  {
-    id: 'inc-002',
-    farm_id: '29b9b72f-0d43-4a23-9b04-dc9e14180f2a',
-    detection_id: null,
-    crop_type: 'Corn',
-    affected_area_estimate: '15%',
-    notes: 'Wild boar entry near east barn corner.',
-    reported_at: new Date(Date.now() - 3600000 * 28).toISOString(),
-    confirmed_by_farmer: true,
-  },
-];
 
 const generateUuid = () => {
   if (typeof uuidv4 === 'function') {
     try {
       return uuidv4();
-    } catch {
-      // fallback
-    }
+    } catch {}
   }
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
     const r = (Math.random() * 16) | 0;
@@ -82,13 +57,9 @@ const createIncident = async (req, res) => {
       .single();
 
     if (error) {
-      console.warn(`[incidents warning] Database insert notice (${error.message}). Using fallback memory storage.`);
-      const fallbackItem = {
-        id: generateUuid(),
-        ...newIncidentPayload,
-      };
-      memoryIncidents.unshift(fallbackItem);
-      return res.status(201).json(fallbackItem);
+      console.warn(`[incidents notice] Supabase offline (${error.message}). Saving to localStore.`);
+      const localItem = localStore.insert('crop_loss_incidents', newIncidentPayload);
+      return res.status(201).json(localItem);
     }
 
     return res.status(201).json(data);
@@ -113,15 +84,14 @@ const getIncidents = async (req, res) => {
     const { data, error } = await query;
 
     if (error) {
-      console.warn(`[incidents warning] Database query notice (${error.message}). Returning memory fallback items.`);
-      const filtered = farm_id
-        ? memoryIncidents.filter((i) => i.farm_id === farm_id)
-        : memoryIncidents;
-      return res.status(200).json(filtered);
+      console.warn(`[incidents notice] Supabase offline (${error.message}). Returning localStore items.`);
+      const items = localStore.find('crop_loss_incidents', farm_id ? (i => i.farm_id === farm_id) : null);
+      return res.status(200).json(items);
     }
 
     if (!data || data.length === 0) {
-      return res.status(200).json(memoryIncidents);
+      const items = localStore.find('crop_loss_incidents', farm_id ? (i => i.farm_id === farm_id) : null);
+      return res.status(200).json(items);
     }
 
     return res.status(200).json(data);

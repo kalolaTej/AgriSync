@@ -6,6 +6,7 @@ export default function Settings() {
   const { session } = useAuth()
   const [confThresh, setConfThresh] = useState(50)
   const [cooldown, setCooldown] = useState(10)
+  const [targetFps, setTargetFps] = useState(30)
   const [rtspUrl, setRtspUrl] = useState('rtsp://192.168.1.100:554/stream1')
   const [emailAlerts, setEmailAlerts] = useState(true)
   const [loading, setLoading] = useState(true)
@@ -26,6 +27,7 @@ export default function Settings() {
           if (data.settings) {
             setConfThresh(data.settings.confidenceThreshold ?? 50)
             setCooldown(data.settings.cooldownPeriod ?? 10)
+            setTargetFps(data.settings.targetFps ?? 30)
             setRtspUrl(data.settings.rtspUrl || 'rtsp://192.168.1.100:554/stream1')
             setEmailAlerts(data.settings.emailAlerts ?? true)
           }
@@ -48,6 +50,7 @@ export default function Settings() {
     const payload = {
       confidenceThreshold: confThresh,
       cooldownPeriod: cooldown,
+      targetFps,
       rtspUrl,
       emailAlerts
     }
@@ -65,12 +68,12 @@ export default function Settings() {
       })
 
       if (res.ok) {
-        setToastMessage(`✓ Confidence threshold set to ${confThresh}% in backend! AI detection results updated automatically.`)
+        setToastMessage(`✓ Configuration saved! Target FPS set to ${targetFps} FPS, Confidence threshold to ${confThresh}%.`)
       } else {
-        setToastMessage(`✓ Saved threshold to ${confThresh}% locally.`)
+        setToastMessage(`✓ Saved threshold (${confThresh}%) and FPS (${targetFps} FPS) locally.`)
       }
     } catch {
-      setToastMessage(`✓ Saved threshold to ${confThresh}% locally.`)
+      setToastMessage(`✓ Saved threshold (${confThresh}%) and FPS (${targetFps} FPS) locally.`)
     } finally {
       setSaving(false)
       setTimeout(() => setToastMessage(''), 4000)
@@ -126,6 +129,25 @@ export default function Settings() {
               />
               <p className="text-[11px] text-[#666666] mt-1">
                 When set to <strong>{confThresh}%</strong>, detections with confidence below {confThresh}% will be filtered out by the backend automatically.
+              </p>
+            </div>
+
+            <div>
+              <div className="flex justify-between items-center text-xs font-semibold mb-1">
+                <label className="text-[#2F2F2F]">Target Stream FPS (Frame Rate): <strong className="text-[#6B8E23] text-sm">{targetFps} FPS</strong></label>
+                <span className="text-[#8A8A8A]">Range: 5 - 60 FPS</span>
+              </div>
+              <input
+                type="range"
+                min="5"
+                max="60"
+                step="5"
+                value={targetFps}
+                onChange={(e) => setTargetFps(parseInt(e.target.value, 10))}
+                className="w-full accent-[#8FAF5A]"
+              />
+              <p className="text-[11px] text-[#666666] mt-1">
+                Adjusts target video frame rate (FPS) for live camera streams and preview rendering.
               </p>
             </div>
 

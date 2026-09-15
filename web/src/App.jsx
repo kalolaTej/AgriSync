@@ -13,6 +13,13 @@ import Reports from './pages/Reports'
 import Settings from './pages/Settings'
 import NotFound from './pages/NotFound'
 
+import CreateLot from './pages/produce/CreateLot'
+import LotDetail from './pages/produce/LotDetail'
+import ProcurementCentres from './pages/produce/ProcurementCentres'
+import SlotBooking from './pages/produce/SlotBooking'
+import QueueStatus from './pages/produce/QueueStatus'
+import Transactions from './pages/produce/Transactions'
+
 export default function App() {
   return (
     <AuthProvider>
@@ -33,6 +40,12 @@ export default function App() {
               <Route path="/alerts" element={<Alerts />} />
               <Route path="/reports" element={<Reports />} />
               <Route path="/settings" element={<Settings />} />
+              <Route path="/produce/create" element={<CreateLot />} />
+              <Route path="/produce/:id" element={<LotDetail />} />
+              <Route path="/procurement" element={<ProcurementCentres />} />
+              <Route path="/procurement/:centreId/slots" element={<SlotBooking />} />
+              <Route path="/procurement/:centreId/queue" element={<QueueStatus />} />
+              <Route path="/transactions/:lotId" element={<Transactions />} />
             </Route>
           </Route>
 

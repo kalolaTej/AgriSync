@@ -13,6 +13,9 @@ const cameraRoutes = require('./routes/cameras');
 const farmRoutes = require('./routes/farms');
 const notificationRoutes = require('./routes/notifications');
 const settingsRoutes = require('./routes/settings');
+const lotRoutes = require('./routes/lots');
+const procurementRoutes = require('./routes/procurement');
+const transactionRoutes = require('./routes/transactions');
 
 const app = express();
 const server = http.createServer(app);
@@ -52,6 +55,9 @@ app.use('/api', cameraRoutes);
 app.use('/api', farmRoutes);
 app.use('/api', notificationRoutes);
 app.use('/api', settingsRoutes);
+app.use('/api', lotRoutes);
+app.use('/api', procurementRoutes);
+app.use('/api', transactionRoutes);
 
 // health check endpoints
 app.get('/', (req, res) => {

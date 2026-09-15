@@ -18,6 +18,7 @@ const procurementRoutes = require('./routes/procurement');
 const transactionRoutes = require('./routes/transactions');
 const matchingRoutes = require('./routes/matching');
 const mandiRoutes = require('./routes/mandi');
+const saleWindowRoutes = require('./routes/saleWindow');
 
 const app = express();
 const server = http.createServer(app);
@@ -62,6 +63,7 @@ app.use('/api', procurementRoutes);
 app.use('/api', transactionRoutes);
 app.use('/api', matchingRoutes);
 app.use('/api', mandiRoutes);
+app.use('/api', saleWindowRoutes);
 
 // health check endpoints
 app.get('/', (req, res) => {

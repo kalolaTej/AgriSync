@@ -16,6 +16,8 @@ const settingsRoutes = require('./routes/settings');
 const lotRoutes = require('./routes/lots');
 const procurementRoutes = require('./routes/procurement');
 const transactionRoutes = require('./routes/transactions');
+const matchingRoutes = require('./routes/matching');
+const mandiRoutes = require('./routes/mandi');
 
 const app = express();
 const server = http.createServer(app);
@@ -58,6 +60,8 @@ app.use('/api', settingsRoutes);
 app.use('/api', lotRoutes);
 app.use('/api', procurementRoutes);
 app.use('/api', transactionRoutes);
+app.use('/api', matchingRoutes);
+app.use('/api', mandiRoutes);
 
 // health check endpoints
 app.get('/', (req, res) => {

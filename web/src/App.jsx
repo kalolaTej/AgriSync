@@ -19,6 +19,8 @@ import ProcurementCentres from './pages/produce/ProcurementCentres'
 import SlotBooking from './pages/produce/SlotBooking'
 import QueueStatus from './pages/produce/QueueStatus'
 import Transactions from './pages/produce/Transactions'
+import MandiPrices from './pages/produce/MandiPrices'
+import BuyerMatches from './pages/produce/BuyerMatches'
 
 export default function App() {
   return (
@@ -42,6 +44,8 @@ export default function App() {
               <Route path="/settings" element={<Settings />} />
               <Route path="/produce/create" element={<CreateLot />} />
               <Route path="/produce/:id" element={<LotDetail />} />
+              <Route path="/mandi" element={<MandiPrices />} />
+              <Route path="/matches/:lotId" element={<BuyerMatches />} />
               <Route path="/procurement" element={<ProcurementCentres />} />
               <Route path="/procurement/:centreId/slots" element={<SlotBooking />} />
               <Route path="/procurement/:centreId/queue" element={<QueueStatus />} />

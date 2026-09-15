@@ -24,6 +24,7 @@ import BuyerMatches from './pages/produce/BuyerMatches'
 import SaleWindow from './pages/produce/SaleWindow'
 import Incidents from './pages/produce/Incidents'
 import ReportIncident from './pages/produce/ReportIncident'
+import Analytics from './pages/produce/Analytics'
 
 export default function App() {
   return (
@@ -50,6 +51,7 @@ export default function App() {
               <Route path="/produce/:id/sale-window" element={<SaleWindow />} />
               <Route path="/produce/:id/incidents" element={<Incidents />} />
               <Route path="/produce/:id/incidents/report" element={<ReportIncident />} />
+              <Route path="/analytics" element={<Analytics />} />
               <Route path="/mandi" element={<MandiPrices />} />
               <Route path="/matches/:lotId" element={<BuyerMatches />} />
               <Route path="/procurement" element={<ProcurementCentres />} />

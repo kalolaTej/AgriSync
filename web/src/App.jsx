@@ -22,6 +22,8 @@ import Transactions from './pages/produce/Transactions'
 import MandiPrices from './pages/produce/MandiPrices'
 import BuyerMatches from './pages/produce/BuyerMatches'
 import SaleWindow from './pages/produce/SaleWindow'
+import Incidents from './pages/produce/Incidents'
+import ReportIncident from './pages/produce/ReportIncident'
 
 export default function App() {
   return (
@@ -46,6 +48,8 @@ export default function App() {
               <Route path="/produce/create" element={<CreateLot />} />
               <Route path="/produce/:id" element={<LotDetail />} />
               <Route path="/produce/:id/sale-window" element={<SaleWindow />} />
+              <Route path="/produce/:id/incidents" element={<Incidents />} />
+              <Route path="/produce/:id/incidents/report" element={<ReportIncident />} />
               <Route path="/mandi" element={<MandiPrices />} />
               <Route path="/matches/:lotId" element={<BuyerMatches />} />
               <Route path="/procurement" element={<ProcurementCentres />} />

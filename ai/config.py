@@ -116,4 +116,8 @@ def load_config():
         "target_animals": target_animals,
         "rotate_angle": get_env_int("ROTATE_ANGLE", 0),
         "dry_run": dry_run_env,
+        "esp32_enabled": os.getenv("ESP32_ENABLED", "true").lower() in ("true", "1", "yes"),
+        "esp32_mode": os.getenv("ESP32_MODE", "http"),
+        "esp32_ip": os.getenv("ESP32_IP", "192.168.1.150"),
+        "esp32_port": get_env_int("ESP32_PORT", 80),
     }

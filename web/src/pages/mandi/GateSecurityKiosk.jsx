@@ -72,7 +72,7 @@ export const GateSecurityKiosk = () => {
           {/* Simulated ANPR Viewport */}
           <div className="h-56 bg-[#0f172a] rounded-xl flex flex-col items-center justify-center text-white relative overflow-hidden border border-slate-800">
             {/* Viewport scan lines */}
-            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-emerald-500/10 to-transparent animate-pulse pointer-events-none" />
+            <div className="absolute inset-0 bg-linear-to-b from-transparent via-emerald-500/10 to-transparent animate-pulse pointer-events-none" />
 
             {/* Simulation Header Badge */}
             <div className="absolute top-3 left-3 bg-amber-500 text-slate-950 text-[10px] px-2 py-0.5 rounded font-black tracking-wider shadow-xs">

@@ -158,7 +158,7 @@ export default function Detections() {
       <div className="card-base p-4 grid grid-cols-1 sm:grid-cols-4 gap-4">
         {/* search input */}
         <div className="sm:col-span-1">
-          <label className="block text-xs font-bold text-[#666666] mb-1 flex items-center gap-1">
+          <label className="text-xs font-bold text-[#666666] mb-1 flex items-center gap-1">
             <Search size={13} /> Keyword Search
           </label>
           <input
@@ -172,7 +172,7 @@ export default function Detections() {
 
         {/* camera filter */}
         <div>
-          <label className="block text-xs font-bold text-[#666666] mb-1 flex items-center gap-1">
+          <label className="text-xs font-bold text-[#666666] mb-1 flex items-center gap-1">
             <Camera size={13} /> Camera Node
           </label>
           <select
@@ -192,7 +192,7 @@ export default function Detections() {
 
         {/* animal species filter */}
         <div>
-          <label className="block text-xs font-bold text-[#666666] mb-1 flex items-center gap-1">
+          <label className="text-xs font-bold text-[#666666] mb-1 flex items-center gap-1">
             <Filter size={13} /> Species Type
           </label>
           <select
@@ -214,7 +214,7 @@ export default function Detections() {
 
         {/* date range filter */}
         <div>
-          <label className="block text-xs font-bold text-[#666666] mb-1 flex items-center gap-1">
+          <label className="text-xs font-bold text-[#666666] mb-1 flex items-center gap-1">
             <Calendar size={13} /> Time Window
           </label>
           <select

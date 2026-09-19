@@ -1,5 +1,16 @@
 @import "tailwindcss";
 
+@theme {
+  --color-brand-bg: #FAFBF8;
+  --color-brand-text: #2F2F2F;
+  --color-brand-secondary: #666666;
+  --color-brand-muted: #8A8A8A;
+  --color-brand-border: #E5E7EB;
+  --color-olive-500: #8FAF5A;
+  --color-olive-600: #6B8E23;
+  --color-olive-700: #526F1B;
+}
+
 :root {
   --color-green: #166534;
   --color-emerald: #047857;

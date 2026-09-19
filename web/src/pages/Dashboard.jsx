@@ -81,7 +81,7 @@ export const Dashboard = () => {
       </section>
 
       {/* Priority Action Callout Banner */}
-      <div className="bg-gradient-to-r from-[#0f172a] to-[#1e293b] text-white rounded-2xl p-5 shadow-lg flex flex-col md:flex-row md:items-center justify-between gap-4 border border-slate-800">
+      <div className="bg-linear-to-r from-[#0f172a] to-[#1e293b] text-white rounded-2xl p-5 shadow-lg flex flex-col md:flex-row md:items-center justify-between gap-4 border border-slate-800">
         <div className="flex items-start gap-3.5">
           <div className="w-10 h-10 rounded-xl bg-[#047857] flex items-center justify-center text-white shrink-0 shadow-md">
             <span className="material-symbols-outlined text-2xl">local_shipping</span>

@@ -1,96 +1,308 @@
-import React from 'react'
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
-import { AuthProvider } from './context/AuthContext'
-import ProtectedRoute from './components/ProtectedRoute'
-import DashboardLayout from './components/DashboardLayout'
-import Login from './pages/Login'
-import Register from './pages/Register'
-import Dashboard from './pages/Dashboard'
-import Cameras from './pages/Cameras'
-import Detections from './pages/Detections'
-import DetectionDetail from './pages/DetectionDetail'
-import Alerts from './pages/Alerts'
-import Reports from './pages/Reports'
-import Settings from './pages/Settings'
-import NotFound from './pages/NotFound'
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider } from './context/AuthContext';
+import ProtectedRoute from './components/ProtectedRoute';
+import DashboardLayout from './components/DashboardLayout';
 
-// Pre-Harvest Pages
-import PreharvestIncidentReport from './pages/preharvest/IncidentReport'
-import PreharvestIncidentAnalytics from './pages/preharvest/IncidentAnalytics'
+// Public & Onboarding Pages
+import LoginPage from './pages/public/LoginPage';
+import PublicPortal from './pages/public/PublicPortal';
+import HowItWorks from './pages/public/HowItWorks';
+import FarmerRegistration from './pages/public/FarmerRegistration';
 
-// Post-Harvest Pages (Krushn)
-import CreateLot from './pages/produce/CreateLot'
-import LotDetail from './pages/produce/LotDetail'
-import ProcurementCentres from './pages/produce/ProcurementCentres'
-import SlotBooking from './pages/produce/SlotBooking'
-import QueueStatus from './pages/produce/QueueStatus'
-import Transactions from './pages/produce/Transactions'
-import MandiPrices from './pages/produce/MandiPrices'
-import BuyerMatches from './pages/produce/BuyerMatches'
-import ProduceSaleWindow from './pages/produce/SaleWindow'
-import ProduceIncidents from './pages/produce/Incidents'
-import ProduceReportIncident from './pages/produce/ReportIncident'
-import ProduceAnalytics from './pages/produce/Analytics'
+// Core Dashboard & Pre-Harvest Pages
+import Dashboard from './pages/Dashboard';
+import Alerts from './pages/preharvest/Alerts';
+import Cameras from './pages/preharvest/Cameras';
+import CropIncidents from './pages/preharvest/CropIncidents';
+import IncidentAnalytics from './pages/preharvest/IncidentAnalytics';
 
-// Market Intelligence & Logistics Pages (Tej)
-import MarketPrices from './pages/market/MarketPrices'
-import MarketSaleWindow from './pages/market/SaleWindow'
-import BuyerProfile from './pages/market/BuyerProfile'
-import MarketBuyerMatches from './pages/market/BuyerMatches'
-import LogisticsSuggestion from './pages/market/LogisticsSuggestion'
+// Produce & Selling Pages
+import ProduceBatches from './pages/produce/ProduceBatches';
+import SellingAdvisory from './pages/sell/SellingAdvisory';
+import BuyerMatches from './pages/sell/BuyerMatches';
+import MarketPrices from './pages/market/MarketPrices';
+import MarketDetail from './pages/market/MarketDetail';
 
-export default function App() {
+// Fulfillment & Finance Pages
+import StorageDiscovery from './pages/fulfillment/StorageDiscovery';
+import TransportOptions from './pages/fulfillment/TransportOptions';
+import TransactionsSettlements from './pages/fulfillment/TransactionsSettlements';
+import TransactionDetail from './pages/fulfillment/TransactionDetail';
+import FarmProfileSettings from './pages/settings/FarmProfileSettings';
+
+// APMC Mandi Operations Pages
+import LiveQueue from './pages/mandi/LiveQueue';
+import GateSecurityKiosk from './pages/mandi/GateSecurityKiosk';
+import WeighbridgeConsole from './pages/mandi/WeighbridgeConsole';
+import QualityAssayer from './pages/mandi/QualityAssayer';
+
+// Buyer, Driver & Design System Pages
+import InstitutionalBids from './pages/buyer/InstitutionalBids';
+import DriverGatePass from './pages/driver/DriverGatePass';
+import DesignSystemTokens from './pages/design/DesignSystemTokens';
+
+export const App = () => {
   return (
     <AuthProvider>
-      <BrowserRouter>
+      <Router>
         <Routes>
-          {/* Public authentication routes */}
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
+          {/* Public Portal & Onboarding Routes */}
+          <Route path="/" element={<PublicPortal />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/how-it-works" element={<HowItWorks />} />
+          <Route path="/register" element={<FarmerRegistration />} />
 
-          {/* Protected dashboard routes */}
-          <Route element={<ProtectedRoute />}>
-            <Route element={<DashboardLayout />}>
-              <Route path="/" element={<Navigate to="/dashboard" replace />} />
-              <Route path="/dashboard" element={<Dashboard />} />
-              
-              {/* Pre-Harvest Intrusion & Camera Routes */}
-              <Route path="/cameras" element={<Cameras />} />
-              <Route path="/detections" element={<Detections />} />
-              <Route path="/detections/:id" element={<DetectionDetail />} />
-              <Route path="/alerts" element={<Alerts />} />
-              <Route path="/reports" element={<Reports />} />
-              <Route path="/settings" element={<Settings />} />
-              <Route path="/preharvest/incidents/report" element={<PreharvestIncidentReport />} />
-              <Route path="/preharvest/incidents/analytics" element={<PreharvestIncidentAnalytics />} />
+          {/* Farmer Overview */}
+          <Route 
+            path="/dashboard" 
+            element={
+              <ProtectedRoute allowedRoles={['farmer', 'public', 'apmc', 'buyer', 'driver']}>
+                <DashboardLayout>
+                  <Dashboard />
+                </DashboardLayout>
+              </ProtectedRoute>
+            } 
+          />
 
-              {/* Post-Harvest Core & Quality Routes */}
-              <Route path="/produce/create" element={<CreateLot />} />
-              <Route path="/produce/:id" element={<LotDetail />} />
-              <Route path="/produce/:id/sale-window" element={<ProduceSaleWindow />} />
-              <Route path="/produce/:id/incidents" element={<ProduceIncidents />} />
-              <Route path="/produce/:id/incidents/report" element={<ProduceReportIncident />} />
-              <Route path="/analytics" element={<ProduceAnalytics />} />
-              <Route path="/mandi" element={<MandiPrices />} />
-              <Route path="/matches/:lotId" element={<BuyerMatches />} />
-              <Route path="/procurement" element={<ProcurementCentres />} />
-              <Route path="/procurement/:centreId/slots" element={<SlotBooking />} />
-              <Route path="/procurement/:centreId/queue" element={<QueueStatus />} />
-              <Route path="/transactions/:lotId" element={<Transactions />} />
+          {/* Risk & Field (Animal Intrusion System) */}
+          <Route 
+            path="/alerts" 
+            element={
+              <ProtectedRoute allowedRoles={['farmer']}>
+                <DashboardLayout>
+                  <Alerts />
+                </DashboardLayout>
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/cameras" 
+            element={
+              <ProtectedRoute allowedRoles={['farmer']}>
+                <DashboardLayout>
+                  <Cameras />
+                </DashboardLayout>
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/detections" 
+            element={
+              <ProtectedRoute allowedRoles={['farmer']}>
+                <DashboardLayout>
+                  <CropIncidents />
+                </DashboardLayout>
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/protect/incidents" 
+            element={
+              <ProtectedRoute allowedRoles={['farmer']}>
+                <DashboardLayout>
+                  <CropIncidents />
+                </DashboardLayout>
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/protect/analytics" 
+            element={
+              <ProtectedRoute allowedRoles={['farmer']}>
+                <DashboardLayout>
+                  <IncidentAnalytics />
+                </DashboardLayout>
+              </ProtectedRoute>
+            } 
+          />
 
-              {/* Market Intelligence & Logistics Routes */}
-              <Route path="/market/prices" element={<MarketPrices />} />
-              <Route path="/market/sale-window" element={<MarketSaleWindow />} />
-              <Route path="/market/buyer-profile" element={<BuyerProfile />} />
-              <Route path="/market/buyer-matches" element={<MarketBuyerMatches />} />
-              <Route path="/market/logistics" element={<LogisticsSuggestion />} />
-            </Route>
-          </Route>
+          {/* Commerce & Mandi */}
+          <Route 
+            path="/produce" 
+            element={
+              <ProtectedRoute allowedRoles={['farmer']}>
+                <DashboardLayout>
+                  <ProduceBatches />
+                </DashboardLayout>
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/sell/advisory" 
+            element={
+              <ProtectedRoute allowedRoles={['farmer']}>
+                <DashboardLayout>
+                  <SellingAdvisory />
+                </DashboardLayout>
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/sell/buyers" 
+            element={
+              <ProtectedRoute allowedRoles={['farmer']}>
+                <DashboardLayout>
+                  <BuyerMatches />
+                </DashboardLayout>
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/market" 
+            element={
+              <ProtectedRoute allowedRoles={['farmer', 'public', 'apmc', 'buyer', 'driver']}>
+                <DashboardLayout>
+                  <MarketPrices />
+                </DashboardLayout>
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/market/:id" 
+            element={
+              <ProtectedRoute allowedRoles={['farmer', 'public', 'apmc', 'buyer', 'driver']}>
+                <DashboardLayout>
+                  <MarketDetail />
+                </DashboardLayout>
+              </ProtectedRoute>
+            } 
+          />
 
-          {/* 404 fallback */}
-          <Route path="*" element={<NotFound />} />
+          {/* Fulfillment & Finance */}
+          <Route 
+            path="/storage" 
+            element={
+              <ProtectedRoute allowedRoles={['farmer', 'buyer']}>
+                <DashboardLayout>
+                  <StorageDiscovery />
+                </DashboardLayout>
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/transport" 
+            element={
+              <ProtectedRoute allowedRoles={['farmer']}>
+                <DashboardLayout>
+                  <TransportOptions />
+                </DashboardLayout>
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/transactions" 
+            element={
+              <ProtectedRoute allowedRoles={['farmer']}>
+                <DashboardLayout>
+                  <TransactionsSettlements />
+                </DashboardLayout>
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/transactions/:id" 
+            element={
+              <ProtectedRoute allowedRoles={['farmer']}>
+                <DashboardLayout>
+                  <TransactionDetail />
+                </DashboardLayout>
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/settings" 
+            element={
+              <ProtectedRoute allowedRoles={['farmer', 'apmc', 'buyer', 'driver', 'public']}>
+                <DashboardLayout>
+                  <FarmProfileSettings />
+                </DashboardLayout>
+              </ProtectedRoute>
+            } 
+          />
+
+          {/* APMC Mandi Operator Routes */}
+          <Route 
+            path="/mandi/queue" 
+            element={
+              <ProtectedRoute allowedRoles={['apmc', 'farmer', 'driver']}>
+                <DashboardLayout>
+                  <LiveQueue />
+                </DashboardLayout>
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/mandi/gate" 
+            element={
+              <ProtectedRoute allowedRoles={['apmc']}>
+                <DashboardLayout>
+                  <GateSecurityKiosk />
+                </DashboardLayout>
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/mandi/weighbridge" 
+            element={
+              <ProtectedRoute allowedRoles={['apmc']}>
+                <DashboardLayout>
+                  <WeighbridgeConsole />
+                </DashboardLayout>
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/mandi/quality" 
+            element={
+              <ProtectedRoute allowedRoles={['apmc']}>
+                <DashboardLayout>
+                  <QualityAssayer />
+                </DashboardLayout>
+              </ProtectedRoute>
+            } 
+          />
+
+          {/* Buyer Routes */}
+          <Route 
+            path="/buyer/bids" 
+            element={
+              <ProtectedRoute allowedRoles={['buyer']}>
+                <DashboardLayout>
+                  <InstitutionalBids />
+                </DashboardLayout>
+              </ProtectedRoute>
+            } 
+          />
+
+          {/* Driver Route */}
+          <Route 
+            path="/driver/gate-pass" 
+            element={
+              <ProtectedRoute allowedRoles={['driver', 'farmer']}>
+                <DashboardLayout>
+                  <DriverGatePass />
+                </DashboardLayout>
+              </ProtectedRoute>
+            } 
+          />
+
+          {/* Design System Token View */}
+          <Route 
+            path="/design-system" 
+            element={
+              <DashboardLayout>
+                <DesignSystemTokens />
+              </DashboardLayout>
+            } 
+          />
+
+          {/* Catch-all Redirect */}
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
-      </BrowserRouter>
+      </Router>
     </AuthProvider>
-  )
-}
+  );
+};
+
+export default App;

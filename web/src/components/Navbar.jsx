@@ -1,72 +1,92 @@
-import React from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import { Sprout, ShieldCheck, User } from 'lucide-react'
-import { useAuth } from '../context/AuthContext'
+import React from 'react';
+import { useAuth } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
-export default function Navbar() {
-  const { user, switchRole, language, setLanguage, logout } = useAuth()
-  const navigate = useNavigate()
+export const Navbar = () => {
+  const { user, logoutUser, language, setLanguage } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logoutUser();
+    navigate('/');
+  };
 
   return (
-    <header className="bg-white border-b border-stone-200 sticky top-0 z-40 h-16 shadow-2xs">
-      <div className="px-4 sm:px-6 h-full flex items-center justify-between gap-4">
-        
-        {/* Brand */}
-        <Link to="/dashboard" className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-emerald-600 flex items-center justify-center text-white shadow-xs">
-            <Sprout size={18} />
-          </div>
-          <span className="font-extrabold text-[#2F2F2F] text-base tracking-tight">
-            AgriSync
-          </span>
-        </Link>
+    <header className="fixed top-0 left-64 right-0 h-16 bg-white/95 backdrop-blur-xl border-b border-[#e2e8f0] shadow-xs z-40 flex items-center justify-between px-6">
+      {/* Role Pill Display & Language Controls */}
+      <div className="flex items-center gap-4">
+        {/* Active Role Pill (Read-Only) */}
+        <div className="flex items-center gap-2 bg-[#dcfce7] px-3 py-1.5 rounded-lg text-xs border border-[#bbf7d0] shadow-2xs">
+          <span className="material-symbols-outlined text-base text-[#166534]">badge</span>
+          <span className="font-extrabold text-[#166534]">Active Role:</span>
+          <span className="text-[#047857] font-bold">{user.roleLabel}</span>
+        </div>
 
-        {/* Role Switcher & Controls */}
+        {/* Language Switcher */}
+        <div className="flex items-center bg-[#f0fdf4] rounded-lg p-0.5 text-xs border border-[#dcfce7]">
+          <button 
+            onClick={() => setLanguage('EN')} 
+            className={`px-2.5 py-1 font-bold rounded-md transition-colors ${language === 'EN' ? 'bg-[#047857] text-white shadow-xs' : 'text-[#166534] hover:bg-[#dcfce7]'}`}
+          >
+            EN
+          </button>
+          <button 
+            onClick={() => setLanguage('MR')} 
+            className={`px-2.5 py-1 font-bold rounded-md transition-colors ${language === 'MR' ? 'bg-[#047857] text-white shadow-xs' : 'text-[#166534] hover:bg-[#dcfce7]'}`}
+          >
+            मराठी
+          </button>
+          <button 
+            onClick={() => setLanguage('HI')} 
+            className={`px-2.5 py-1 font-bold rounded-md transition-colors ${language === 'HI' ? 'bg-[#047857] text-white shadow-xs' : 'text-[#166534] hover:bg-[#dcfce7]'}`}
+          >
+            हिन्दी
+          </button>
+        </div>
+      </div>
+
+      {/* Action Controls & User Profile */}
+      <div className="flex items-center gap-4">
+        {/* Gate-In Entry Button: RESTRICTED STRICTLY TO DRIVER ROLE */}
+        {user?.role === 'driver' && (
+          <button 
+            onClick={() => navigate('/mandi/queue')}
+            className="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#dcfce7] text-[#047857] hover:bg-[#bbf7d0] font-extrabold text-xs transition-colors border border-[#bbf7d0]"
+          >
+            <span className="material-symbols-outlined text-sm">local_shipping</span>
+            <span>+ Gate-In Entry</span>
+          </button>
+        )}
+
+        <div className="h-6 w-px bg-slate-200"></div>
+
         <div className="flex items-center gap-3">
-          {switchRole && (
-            <div className="hidden sm:flex items-center gap-1.5 bg-stone-100 px-2.5 py-1 rounded-md text-xs border border-stone-200">
-              <span className="text-stone-500 font-medium">Role:</span>
-              <select
-                value={user?.role || 'farmer'}
-                onChange={(e) => switchRole(e.target.value)}
-                className="bg-transparent text-emerald-700 font-semibold outline-none cursor-pointer text-xs"
-              >
-                <option value="farmer">Farmer (FPO)</option>
-                <option value="procurement_operator">Procurement Operator</option>
-                <option value="buyer">Institutional Buyer</option>
-                <option value="admin">Administrator</option>
-              </select>
+          <div className="text-right hidden sm:block">
+            <div className="font-extrabold text-xs text-[#0f172a] leading-tight">{user.name}</div>
+            <div className="text-[11px] text-[#047857] font-semibold flex items-center justify-end gap-0.5">
+              <span className="material-symbols-outlined text-xs text-[#166534]">location_on</span>
+              {user.apmc}
+            </div>
+          </div>
+          {user.avatar ? (
+            <img src={user.avatar} alt="Profile" className="w-8 h-8 rounded-full object-cover border-2 border-[#047857] shadow-xs" />
+          ) : (
+            <div className="w-8 h-8 rounded-full bg-[#166534] text-white flex items-center justify-center font-bold text-xs border border-[#a7f3d0]">
+              {user.name.charAt(0)}
             </div>
           )}
 
-          {setLanguage && (
-            <div className="hidden md:flex items-center bg-stone-100 rounded p-0.5 text-xs border border-stone-200">
-              {['EN', 'MR', 'HI'].map((lang) => (
-                <button
-                  key={lang}
-                  onClick={() => setLanguage(lang)}
-                  className={`px-2 py-0.5 rounded font-medium transition-colors ${
-                    language === lang ? 'bg-emerald-600 text-white font-semibold' : 'text-stone-600 hover:text-stone-900'
-                  }`}
-                >
-                  {lang}
-                </button>
-              ))}
-            </div>
-          )}
-
-          {user && (
-            <div className="flex items-center gap-2 pl-2 border-l border-stone-200">
-              <div className="w-7 h-7 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-xs">
-                {user.name ? user.name.charAt(0).toUpperCase() : 'U'}
-              </div>
-              <span className="text-xs font-semibold text-stone-800 hidden sm:inline">
-                {user.name}
-              </span>
-            </div>
-          )}
+          <button 
+            onClick={handleLogout}
+            title="Log out of account"
+            className="p-1.5 text-slate-400 hover:text-red-600 rounded-lg hover:bg-red-50 transition-colors"
+          >
+            <span className="material-symbols-outlined text-lg">logout</span>
+          </button>
         </div>
       </div>
     </header>
-  )
-}
+  );
+};
+
+export default Navbar;

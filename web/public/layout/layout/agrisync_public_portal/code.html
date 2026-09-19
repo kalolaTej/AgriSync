@@ -1,33 +1,607 @@
 <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AgriSync — National Mandi & Farm Procurement Platform</title>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet"/>
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            primary: "#166534",
+            "primary-container": "#14532d",
+            "on-primary": "#ffffff",
+            surface: "#faf8ff",
+            "surface-container": "#eaedff",
+            "surface-container-low": "#f2f3ff",
+            "surface-container-lowest": "#ffffff",
+            "surface-container-high": "#e2e7ff",
+            "on-surface": "#131b2e",
+            secondary: "#515f74",
+            tertiary: "#00456c",
+            outline: "#707a6f"
+          },
+          fontFamily: {
+            sans: ["Inter", "sans-serif"]
+          },
+          keyframes: {
+            pulseGlow: {
+              '0%, 100%': { opacity: 1, transform: 'scale(1)' },
+              '50%': { opacity: 0.7, transform: 'scale(1.05)' }
+            },
+            float: {
+              '0%, 100%': { transform: 'translateY(0px)' },
+              '50%': { transform: 'translateY(-6px)' }
+            },
+            ticker: {
+              '0%': { transform: 'translateX(0%)' },
+              '100%': { transform: 'translateX(-50%)' }
+            }
+          },
+          animation: {
+            'pulse-slow': 'pulseGlow 3s infinite ease-in-out',
+            'float-slow': 'float 4s infinite ease-in-out',
+            'ticker': 'ticker 25s linear infinite'
+          }
+        }
+      }
+    };
+  </script>
 
-<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{"colors":{"surface-container-lowest":"#ffffff","on-background":"#131b2e","surface-bright":"#faf8ff","on-primary-fixed":"#00210b","on-tertiary-container":"#a7d4ff","secondary-container":"#d5e3fc","inverse-surface":"#283044","on-primary-fixed-variant":"#005226","on-tertiary-fixed":"#001d32","tertiary-fixed":"#cde5ff","on-secondary-container":"#57657a","on-secondary-fixed-variant":"#3a485b","on-secondary-fixed":"#0d1c2e","on-primary":"#ffffff","surface-container-highest":"#dae2fd","error":"#ba1a1a","surface-variant":"#dae2fd","primary":"#004c22","surface-container":"#eaedff","on-error":"#ffffff","inverse-on-surface":"#eef0ff","surface-tint":"#1f6c3a","primary-container":"#166534","secondary-fixed":"#d5e3fc","outline-variant":"#bfc9bd","secondary-fixed-dim":"#b9c7df","tertiary":"#00456c","inverse-primary":"#8bd79b","on-tertiary":"#ffffff","on-surface-variant":"#404940","on-error-container":"#93000a","secondary":"#515f74","on-surface":"#131b2e","surface-dim":"#d2d9f4","tertiary-container":"#005d90","primary-fixed-dim":"#8bd79b","primary-fixed":"#a6f4b5","error-container":"#ffdad6","surface-container-high":"#e2e7ff","surface":"#faf8ff","surface-container-low":"#f2f3ff","outline":"#707a6f","on-secondary":"#ffffff","tertiary-fixed-dim":"#94ccff","on-primary-container":"#93e0a2","background":"#faf8ff","on-tertiary-fixed-variant":"#004b74"},"borderRadius":{"DEFAULT":"0.125rem","lg":"0.25rem","xl":"0.5rem","full":"0.75rem"},"spacing":{"space-md":"0.75rem","space-lg":"1rem","gutter-desktop":"1.5rem","space-xl":"1.5rem","space-xs":"0.25rem","margin-desktop":"2rem","margin":"1rem","space-sm":"0.5rem","gutter":"1rem"},"fontFamily":{"display-lg":["Inter"],"headline-lg":["Inter"],"body-md":["Inter"],"display-sm":["Inter"],"body-lg":["Inter"],"label-sm":["Inter"],"body-sm":["Inter"],"headline-md":["Inter"],"headline-xl":["Inter"],"label-md":["Inter"],"headline-sm":["Inter"],"label-xs":["Inter"],"headline-xl-mobile":["Inter"],"data-tabular":["Inter"]},"fontSize":{"display-lg":["36px",{"lineHeight":"44px","letterSpacing":"-0.02em","fontWeight":"700"}],"headline-lg":["20px",{"lineHeight":"28px","letterSpacing":"-0.005em","fontWeight":"600"}],"body-md":["14px",{"lineHeight":"20px","fontWeight":"400"}],"display-sm":["30px",{"lineHeight":"38px","letterSpacing":"-0.015em","fontWeight":"600"}],"body-lg":["16px",{"lineHeight":"24px","fontWeight":"400"}],"label-sm":["12px",{"lineHeight":"16px","fontWeight":"500"}],"body-sm":["13px",{"lineHeight":"18px","fontWeight":"400"}],"headline-md":["18px",{"lineHeight":"26px","fontWeight":"600"}],"headline-xl":["24px",{"lineHeight":"32px","letterSpacing":"-0.01em","fontWeight":"600"}],"label-md":["14px",{"lineHeight":"20px","fontWeight":"500"}],"headline-sm":["16px",{"lineHeight":"24px","fontWeight":"600"}],"label-xs":["11px",{"lineHeight":"14px","letterSpacing":"0.03em","fontWeight":"600"}],"headline-xl-mobile":["20px",{"lineHeight":"28px","letterSpacing":"-0.01em","fontWeight":"600"}],"data-tabular":["13px",{"lineHeight":"18px","fontWeight":"500"}]}}}};</script></head><body class="bg-surface font-body-md text-body-md text-on-surface antialiased"><header class="fixed top-0 left-0 w-full z-50 bg-surface/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="h-16 max-w-7xl mx-auto px-margin-desktop flex items-center justify-between"><div class="flex items-center gap-space-lg"><img alt="Brand logo. - Primary color: #166534 - Font: inter - Mode: light - Roundness: rounded-sm" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1VsF-L6I3tE2D1Pj_JGkEYkBtjjjttdW-IC_bURjItqEVAbExCowlczxuwi0YaCUNCgY3v37ZSlmnVxg91XttY4CpRJKKXAGWnP5AhwgIokjv0x2j54XgDe1T2Q2mdTMQHs6TA8b3cFoBsPyv6uqSnc9EsLqV5CIlBgTSM9lW2LGfHaRqzautgUxfLaTtdqzoOm594gaVqnZj47fkm0ZFoMeH09Y_kIMVoJAbFMzseV4fGnyFQPShTJdPE"/><div class="flex flex-col"><span class="font-headline-sm text-headline-sm text-primary leading-none tracking-tight">AgriSync</span><span class="font-label-xs text-label-xs text-secondary mt-0.5">National Mandi & Procurement</span></div></div><nav class="hidden md:flex items-center gap-space-xl"><a aria-current="page" class="transition-colors text-primary font-headline-sm" href="/">Features</a><a class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors" href="/how-it-works">How It Works</a><a class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors" href="/register">For Farmers</a><a class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors" href="/buyer/bids">For Buyers</a><a class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors" href="/market">Market Prices</a></nav><div class="flex items-center gap-space-md"><a class="px-space-md py-space-xs font-label-md text-label-md text-on-surface hover:bg-surface-container-high rounded transition-colors" href="/dashboard">Log In</a><a class="px-space-md py-space-xs bg-primary-container text-on-primary font-label-md text-label-md rounded shadow-[0_1px_2px_rgba(0,0,0,0.05)] hover:bg-primary transition-colors" href="/dashboard">Get Started</a></div></div></header><main class="w-full pt-16 bg-surface min-h-[calc(100vh-16rem)]"><div class="flex flex-col w-full">
-<section class="relative bg-surface-container-low py-space-xl px-margin-desktop md:py-16">
-<div class="max-w-7xl mx-auto flex flex-col lg:flex-row gap-gutter-desktop items-center">
-<div class="flex flex-col lg:w-7/12 items-start">
-<div class="inline-flex items-center gap-space-xs px-space-md py-space-xs rounded-full bg-surface-container-highest text-primary font-label-sm text-label-sm mb-space-lg shadow-sm">
-<span class="material-symbols-outlined text-sm text-primary" style="font-variation-settings: 'FILL' 1;">verified</span>
-<span>Trusted by 45,000+ Farmers across Maharashtra & Karnataka</span>
-</div>
-<h1 class="font-display-lg text-display-lg text-on-surface mb-space-md tracking-tight">
-          From Farm Protection to Better Selling Decisions.
-        </h1>
-<p class="font-body-lg text-body-lg text-on-surface-variant mb-space-xl max-w-2xl leading-relaxed">
-          AgriSync helps farmers protect crops from wildlife intrusions, manage harvested produce quality, book APMC mandi slots with zero wait times, and connect directly with verified institutional buyers.
+  <style>
+    @layer base {
+      html, body { margin: 0; padding: 0; scroll-behavior: smooth; }
+      body { font-family: 'Inter', sans-serif; overscroll-behavior: none; }
+    }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #f1f5f9; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    
+    .glass-card {
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(226, 232, 240, 0.8);
+    }
+    
+    .hero-gradient {
+      background: radial-gradient(circle at 80% 20%, rgba(16, 185, 129, 0.12) 0%, transparent 40%),
+                  radial-gradient(circle at 20% 80%, rgba(22, 101, 52, 0.08) 0%, transparent 50%),
+                  linear-gradient(180deg, #f0fdf4 0%, #faf8ff 60%, #ffffff 100%);
+    }
+
+    .gradient-text {
+      background: linear-gradient(135deg, #166534 0%, #047857 50%, #065f46 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .ticker-wrap {
+      overflow: hidden;
+      white-space: nowrap;
+    }
+    
+    .ticker-move {
+      display: inline-block;
+      white-space: nowrap;
+      animation: ticker 30s linear infinite;
+    }
+    .ticker-move:hover {
+      animation-play-state: paused;
+    }
+  </style>
+</head>
+<body class="bg-surface text-on-surface antialiased selection:bg-emerald-500 selection:text-white">
+
+  <!-- TOP HEADER NAVBAR -->
+  <header class="fixed top-0 left-0 w-full z-50 bg-white/90 backdrop-blur-xl border-b border-slate-200/80 shadow-xs transition-all duration-300">
+    
+    <!-- LIVE MANDI TICKER BAR -->
+    <div class="bg-slate-900 text-slate-200 text-[11px] py-1.5 px-4 border-b border-slate-800 flex items-center justify-between overflow-hidden">
+      <div class="flex items-center gap-2 shrink-0 pr-4 bg-slate-900 z-10 border-r border-slate-800">
+        <span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+        <span class="font-bold text-emerald-400 uppercase tracking-wider text-[10px]">LIVE MANDI RATES</span>
+      </div>
+
+      <div class="ticker-wrap flex-1">
+        <div class="ticker-move text-slate-300 space-x-8 font-medium">
+          <span>🌾 <strong class="text-white">Pimpalgaon APMC:</strong> Garwa Onion ₹2,450/qtl <span class="text-emerald-400 font-bold">▲ +3.2%</span></span>
+          <span>🧅 <strong class="text-white">Lasalgaon Yard:</strong> Red Onion ₹2,620/qtl <span class="text-emerald-400 font-bold">▲ +1.8%</span></span>
+          <span>🌱 <strong class="text-white">Nashik Central:</strong> Soyabean Grade-A ₹4,850/qtl <span class="text-emerald-400 font-bold">▲ +0.5%</span></span>
+          <span>🍅 <strong class="text-white">Junna APMC:</strong> Tomato FAQ ₹1,820/qtl <span class="text-rose-400 font-bold">▼ -1.1%</span></span>
+          <span>🚚 <strong class="text-white">Live Gate Slot Wait Time:</strong> <span class="text-emerald-400 font-bold">14 Mins Avg</span></span>
+          <span>🛡️ <strong class="text-white">Field Deterrents Active:</strong> 1,420 Acres Protected</span>
+        </div>
+      </div>
+
+      <div class="hidden sm:flex items-center gap-3 shrink-0 pl-4 bg-slate-900 z-10 border-l border-slate-800 text-[10px]">
+        <span class="text-slate-400">APMC Toll Free:</span>
+        <a href="tel:18002334567" class="text-emerald-300 font-bold hover:underline flex items-center gap-1">
+          <span class="material-symbols-outlined text-xs">call</span>
+          <span>1800 233 4567</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- MAIN NAVBAR CONTAINER -->
+    <div class="h-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-4">
+      
+      <!-- Brand Logo & Identity -->
+      <a href="/" class="flex items-center gap-3 group">
+        <img src="/agrisync-logo.png" alt="AgriSync Logo" class="w-10 h-10 rounded-xl object-contain bg-white p-0.5 border border-emerald-200 shadow-xs group-hover:scale-105 transition-transform duration-300" />
+        <div class="flex flex-col">
+          <div class="flex items-center gap-1.5">
+            <span class="font-extrabold text-xl text-slate-900 tracking-tight leading-none group-hover:text-primary transition-colors">AgriSync</span>
+            <span class="px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800 font-bold text-[9px] uppercase tracking-wider">INDIA</span>
+          </div>
+          <span class="text-[11px] text-slate-500 font-medium tracking-tight">National Mandi & Procurement</span>
+        </div>
+      </a>
+
+      <!-- Center Navigation Links -->
+      <nav class="hidden lg:flex items-center gap-8 text-xs font-semibold text-slate-700">
+        <a href="#features" class="relative py-1 text-primary font-bold after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-primary after:rounded-full">Features</a>
+        <a href="#how-it-works" class="relative py-1 hover:text-primary transition-colors after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-primary hover:after:w-full after:transition-all">How It Works</a>
+        <a href="#mandi-prices" class="relative py-1 hover:text-primary transition-colors after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-primary hover:after:w-full after:transition-all">Mandi Rates</a>
+        <a href="/buyer/bids" class="relative py-1 hover:text-primary transition-colors after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-primary hover:after:w-full after:transition-all">Institutional Buyers</a>
+        <a href="/register" class="relative py-1 hover:text-primary transition-colors after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-primary hover:after:w-full after:transition-all">Farmer Onboarding</a>
+      </nav>
+
+      <!-- Right Action CTAs -->
+      <div class="flex items-center gap-3">
+        <a href="/dashboard" class="hidden sm:inline-flex items-center gap-1 px-4 py-2 font-semibold text-xs text-slate-700 hover:text-primary hover:bg-slate-100/80 rounded-xl transition-all">
+          <span class="material-symbols-outlined text-base text-slate-500">lock</span>
+          <span>Log In</span>
+        </a>
+        <a href="/dashboard" class="inline-flex items-center gap-1.5 px-4 sm:px-5 py-2.5 bg-gradient-to-r from-emerald-700 to-green-800 hover:from-emerald-800 hover:to-green-900 text-white font-bold text-xs rounded-xl shadow-md shadow-emerald-900/20 hover:shadow-lg hover:shadow-emerald-900/30 transition-all duration-300 hover:-translate-y-0.5">
+          <span>Open Portal</span>
+          <span class="material-symbols-outlined text-base">arrow_forward</span>
+        </a>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- MAIN HERO SECTION -->
+  <main class="pt-24 w-full min-h-screen">
+    
+    <!-- Hero Banner with Dynamic Gradient -->
+    <section class="relative hero-gradient py-12 lg:py-20 px-4 sm:px-6 lg:px-8 border-b border-slate-200/70 overflow-hidden">
+      
+      <!-- Ambient Decorative Blur Circles -->
+      <div class="absolute top-10 right-10 w-96 h-96 bg-emerald-300/20 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="absolute bottom-0 left-10 w-80 h-80 bg-green-200/30 rounded-full blur-3xl pointer-events-none"></div>
+
+      <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 items-center relative z-10">
+        
+        <!-- Left Hero Content -->
+        <div class="lg:col-span-7 flex flex-col items-start">
+          
+          <!-- Trust Badge Pill -->
+          <div class="inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-white/90 backdrop-blur-md text-emerald-900 border border-emerald-200/90 text-xs font-semibold mb-6 shadow-sm shadow-emerald-900/5 hover:border-emerald-300 transition-all">
+            <span class="flex h-2 w-2 relative">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-600"></span>
+            </span>
+            <span class="material-symbols-outlined text-sm text-emerald-700 font-bold">verified</span>
+            <span>Trusted by 45,000+ Farmers & 12 APMC Mandis</span>
+          </div>
+
+          <!-- Main Title -->
+          <h1 class="text-3xl sm:text-5xl lg:text-6xl font-black text-slate-900 tracking-tight leading-[1.15] mb-6">
+            From Farm Protection to <br class="hidden sm:inline"/>
+            <span class="gradient-text">Better Selling Decisions.</span>
+          </h1>
+
+          <!-- Detailed Subtitle -->
+          <p class="text-base sm:text-lg text-slate-600 leading-relaxed mb-8 max-w-2xl font-normal">
+            AgriSync connects solar perimeter intrusion defense with real-time APMC mandi slot booking, NIR produce assaying, and direct institutional buyer matching.
+          </p>
+
+          <!-- Interactive Action Buttons -->
+          <div class="flex flex-wrap items-center gap-4 w-full sm:w-auto mb-10">
+            <a href="/dashboard" class="w-full sm:w-auto inline-flex justify-center items-center gap-2.5 px-7 py-4 bg-gradient-to-r from-emerald-700 via-green-700 to-emerald-800 text-white font-bold text-sm rounded-xl shadow-xl shadow-emerald-900/25 hover:shadow-emerald-900/40 hover:-translate-y-0.5 transition-all duration-300">
+              <span class="material-symbols-outlined text-xl">agriculture</span>
+              <span>Get Started as Farmer</span>
+            </a>
+            
+            <a href="/how-it-works" class="w-full sm:w-auto inline-flex justify-center items-center gap-2.5 px-7 py-4 bg-white/90 backdrop-blur-md text-slate-800 font-bold text-sm rounded-xl border border-slate-200 shadow-sm hover:bg-slate-50 hover:border-slate-300 transition-all duration-300">
+              <span class="material-symbols-outlined text-xl text-emerald-700">play_circle</span>
+              <span>Explore How It Works</span>
+            </a>
+          </div>
+
+          <!-- Quick Role Shortcuts -->
+          <div class="w-full flex items-center gap-2 mb-8 overflow-x-auto pb-2 sm:pb-0 text-xs text-slate-500 font-medium">
+            <span class="shrink-0 font-bold text-slate-700">Quick Access:</span>
+            <a href="/dashboard" class="shrink-0 px-3 py-1 rounded-lg bg-emerald-50 text-emerald-800 border border-emerald-200/60 hover:bg-emerald-100 font-semibold transition-colors">🌾 Farmer View</a>
+            <a href="/mandi/queue" class="shrink-0 px-3 py-1 rounded-lg bg-blue-50 text-blue-800 border border-blue-200/60 hover:bg-blue-100 font-semibold transition-colors">🏛️ APMC Mandi Officer</a>
+            <a href="/buyer/bids" class="shrink-0 px-3 py-1 rounded-lg bg-purple-50 text-purple-800 border border-purple-200/60 hover:bg-purple-100 font-semibold transition-colors">💼 Institutional Buyer</a>
+            <a href="/driver/gate-pass" class="shrink-0 px-3 py-1 rounded-lg bg-amber-50 text-amber-800 border border-amber-200/60 hover:bg-amber-100 font-semibold transition-colors">🚚 Drayage Driver</a>
+          </div>
+
+          <!-- Quick Statistics Strip -->
+          <div class="w-full grid grid-cols-2 sm:grid-cols-4 gap-3.5 pt-6 border-t border-slate-200/80">
+            <div class="p-3.5 bg-white/80 backdrop-blur-md rounded-xl border border-slate-200/70 shadow-xs hover:border-emerald-300 transition-all">
+              <span class="text-xl sm:text-2xl font-black text-emerald-800 block tracking-tight">₹140 Cr+</span>
+              <span class="text-[11px] text-slate-500 font-medium">Produce Traded</span>
+            </div>
+            <div class="p-3.5 bg-white/80 backdrop-blur-md rounded-xl border border-slate-200/70 shadow-xs hover:border-emerald-300 transition-all">
+              <span class="text-xl sm:text-2xl font-black text-slate-900 block tracking-tight">12 Mandis</span>
+              <span class="text-[11px] text-slate-500 font-medium">Integrated APMCs</span>
+            </div>
+            <div class="p-3.5 bg-white/80 backdrop-blur-md rounded-xl border border-slate-200/70 shadow-xs hover:border-emerald-300 transition-all">
+              <span class="text-xl sm:text-2xl font-black text-emerald-700 block tracking-tight">35 Min</span>
+              <span class="text-[11px] text-slate-500 font-medium">Avg. Yard Clearance</span>
+            </div>
+            <div class="p-3.5 bg-white/80 backdrop-blur-md rounded-xl border border-slate-200/70 shadow-xs hover:border-emerald-300 transition-all">
+              <span class="text-xl sm:text-2xl font-black text-slate-900 block tracking-tight">99.2%</span>
+              <span class="text-[11px] text-slate-500 font-medium">Protection Uptime</span>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Right Hero Interactive Card Showcase -->
+        <div class="lg:col-span-5 w-full flex flex-col items-center">
+          <div class="w-full max-w-md bg-white/90 backdrop-blur-xl rounded-2xl p-6 shadow-2xl shadow-slate-900/10 border border-slate-200/90 relative group hover:border-emerald-400 transition-all duration-500">
+            
+            <!-- Floating Badge Accent -->
+            <div class="absolute -top-3 right-6 px-3 py-1 rounded-full bg-gradient-to-r from-emerald-600 to-green-700 text-white text-[10px] font-bold uppercase tracking-wider shadow-md">
+              Live Mandi Pass
+            </div>
+
+            <!-- Card Header -->
+            <div class="flex items-center justify-between pb-4 border-b border-slate-100">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-200/80 text-emerald-800 flex items-center justify-center">
+                  <span class="material-symbols-outlined text-2xl">confirmation_number</span>
+                </div>
+                <div>
+                  <h3 class="font-bold text-sm text-slate-900 leading-tight">Digital Gate Token</h3>
+                  <span class="text-[11px] text-slate-500 font-medium">Pimpalgaon APMC Yard #2</span>
+                </div>
+              </div>
+              <span class="px-2.5 py-1 rounded-md bg-emerald-100 text-emerald-800 text-[11px] font-bold">
+                CONFIRMED
+              </span>
+            </div>
+
+            <!-- Ticket Body -->
+            <div class="my-4 p-4 bg-slate-50/90 rounded-xl border border-slate-200/60 space-y-3 text-xs">
+              <div class="flex justify-between items-center">
+                <span class="text-slate-500 font-medium">Farmer Reg ID:</span>
+                <span class="font-bold text-slate-900 font-mono">MH-NSK-2025-8891</span>
+              </div>
+              <div class="flex justify-between items-center">
+                <span class="text-slate-500 font-medium">Commodity:</span>
+                <span class="font-bold text-slate-900">Garwa Onion (Grade A, FAQ)</span>
+              </div>
+              <div class="flex justify-between items-center">
+                <span class="text-slate-500 font-medium">Est. Quantity:</span>
+                <span class="font-bold text-slate-900">45 Quintals (1 Tractor)</span>
+              </div>
+              <div class="flex justify-between items-center">
+                <span class="text-slate-500 font-medium">Slot Arrival Window:</span>
+                <span class="text-emerald-700 font-bold bg-emerald-100/60 px-2 py-0.5 rounded">Today, 08:30 - 09:15 AM</span>
+              </div>
+              
+              <!-- Simulated Barcode -->
+              <div class="pt-3 border-t border-slate-200 flex flex-col items-center gap-1.5">
+                <div class="w-full h-10 bg-slate-900 rounded flex items-center justify-center text-white text-[10px] tracking-widest font-mono select-none">
+                  ||||| ||| ||||||| || |||||| |||||||| ||||
+                </div>
+                <span class="text-[10px] text-slate-400 font-mono">SCAN AT APMC GATE BARRIER ANPR</span>
+              </div>
+            </div>
+
+            <!-- Card Footer CTA -->
+            <a href="/mandi/queue" class="w-full py-3 bg-gradient-to-r from-emerald-700 to-green-800 hover:from-emerald-800 hover:to-green-900 text-white text-xs font-bold rounded-xl shadow-md hover:shadow-lg transition-all text-center flex items-center justify-center gap-1.5">
+              <span>Track Live Mandi Yard Queue</span>
+              <span class="material-symbols-outlined text-base">east</span>
+            </a>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- FOUR PILLARS SECTION -->
+    <section id="features" class="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
+      
+      <div class="text-center max-w-3xl mx-auto mb-16">
+        <span class="px-3.5 py-1 rounded-full bg-emerald-100 text-emerald-900 text-xs font-bold uppercase tracking-wider">
+          Core Platform Architecture
+        </span>
+        <h2 class="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight mt-3 mb-4">
+          Four Pillars of AgriSync Field Operations
+        </h2>
+        <p class="text-sm sm:text-base text-slate-600 leading-relaxed font-normal">
+          Engineered specifically for Indian agrarian environments, removing friction from nocturnal perimeter protection to direct bank DBT settlement.
         </p>
-<div class="flex flex-wrap items-center gap-space-md w-full sm:w-auto mb-space-xl">
-<a class="w-full sm:w-auto inline-flex justify-center items-center gap-space-xs px-space-xl py-space-md bg-primary-container text-on-primary font-headline-sm text-headline-sm rounded-lg shadow-md hover:bg-primary transition-all" href="/dashboard">
-<span class="material-symbols-outlined text-lg">agriculture</span>
-<span>Get Started as Farmer</span>
-</a>
-<a class="w-full sm:w-auto inline-flex justify-center items-center gap-space-xs px-space-xl py-space-md bg-surface-container-lowest text-on-surface font-headline-sm text-headline-sm rounded-lg shadow-sm hover:bg-surface-container transition-all" href="/how-it-works">
-<span class="material-symbols-outlined text-lg text-secondary">play_circle</span>
-<span>Explore How It Works</span>
-</a>
-</div>
-</div>
-</div>
-</section>
-</div>
-</main></body></html>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        
+        <!-- Pillar 1 -->
+        <div class="glass-card rounded-2xl p-6 border border-slate-200 shadow-sm hover:shadow-xl hover:border-emerald-400 hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between group">
+          <div>
+            <div class="w-14 h-14 rounded-2xl bg-emerald-50 border border-emerald-200/80 text-emerald-800 flex items-center justify-center mb-5 group-hover:bg-emerald-700 group-hover:text-white transition-colors duration-300">
+              <span class="material-symbols-outlined text-3xl">shield</span>
+            </div>
+            <span class="text-[11px] font-bold text-emerald-700 uppercase tracking-wider">01. Field Defense</span>
+            <h3 class="text-lg font-bold text-slate-900 mt-1 mb-2">Crop Protection AI</h3>
+            <p class="text-xs text-slate-600 leading-relaxed font-normal">
+              Automated nocturnal perimeter surveillance powered by solar YOLO cameras to detect wild boars and stray cattle with acoustic deterrence.
+            </p>
+          </div>
+          <div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-emerald-700 text-xs font-bold">
+            <span>Zero nocturnal crop raids</span>
+            <span class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">arrow_forward</span>
+          </div>
+        </div>
+
+        <!-- Pillar 2 -->
+        <div class="glass-card rounded-2xl p-6 border border-slate-200 shadow-sm hover:shadow-xl hover:border-emerald-400 hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between group">
+          <div>
+            <div class="w-14 h-14 rounded-2xl bg-emerald-50 border border-emerald-200/80 text-emerald-800 flex items-center justify-center mb-5 group-hover:bg-emerald-700 group-hover:text-white transition-colors duration-300">
+              <span class="material-symbols-outlined text-3xl">inventory_2</span>
+            </div>
+            <span class="text-[11px] font-bold text-emerald-700 uppercase tracking-wider">02. Standardisation</span>
+            <h3 class="text-lg font-bold text-slate-900 mt-1 mb-2">Produce & Quality Lots</h3>
+            <p class="text-xs text-slate-600 leading-relaxed font-normal">
+              Digitized harvest batch records with moisture metrics, size sorting, and verified QR code quality certificates ready for mandi display.
+            </p>
+          </div>
+          <div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-emerald-700 text-xs font-bold">
+            <span>NIR Assayed Agmarknet Parity</span>
+            <span class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">arrow_forward</span>
+          </div>
+        </div>
+
+        <!-- Pillar 3 -->
+        <div class="glass-card rounded-2xl p-6 border border-slate-200 shadow-sm hover:shadow-xl hover:border-emerald-400 hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between group">
+          <div>
+            <div class="w-14 h-14 rounded-2xl bg-emerald-50 border border-emerald-200/80 text-emerald-800 flex items-center justify-center mb-5 group-hover:bg-emerald-700 group-hover:text-white transition-colors duration-300">
+              <span class="material-symbols-outlined text-3xl">confirmation_number</span>
+            </div>
+            <span class="text-[11px] font-bold text-emerald-700 uppercase tracking-wider">03. Logistics Flow</span>
+            <h3 class="text-lg font-bold text-slate-900 mt-1 mb-2">Mandi Slot Booking</h3>
+            <p class="text-xs text-slate-600 leading-relaxed font-normal">
+              Real-time digital entry tokens and live weighbridge queue trackers for Pimpalgaon, Lasalgaon, and regional APMC yards.
+            </p>
+          </div>
+          <div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-emerald-700 text-xs font-bold">
+            <span>Direct Gate ANPR Clearance</span>
+            <span class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">arrow_forward</span>
+          </div>
+        </div>
+
+        <!-- Pillar 4 -->
+        <div class="glass-card rounded-2xl p-6 border border-slate-200 shadow-sm hover:shadow-xl hover:border-emerald-400 hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between group">
+          <div>
+            <div class="w-14 h-14 rounded-2xl bg-emerald-50 border border-emerald-200/80 text-emerald-800 flex items-center justify-center mb-5 group-hover:bg-emerald-700 group-hover:text-white transition-colors duration-300">
+              <span class="material-symbols-outlined text-3xl">storefront</span>
+            </div>
+            <span class="text-[11px] font-bold text-emerald-700 uppercase tracking-wider">04. Fair Procurement</span>
+            <h3 class="text-lg font-bold text-slate-900 mt-1 mb-2">Direct Buyer Matching</h3>
+            <p class="text-xs text-slate-600 leading-relaxed font-normal">
+              Transparent price pairing with verified institutional food processors, export packers, and retail cold chain operators.
+            </p>
+          </div>
+          <div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-emerald-700 text-xs font-bold">
+            <span>T+1 Bank DBT Settlement</span>
+            <span class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">arrow_forward</span>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- MANDI MARKET ADVISORY MATRIX SECTION -->
+    <section id="mandi-prices" class="py-16 bg-slate-900 text-slate-100 border-t border-b border-slate-800">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-4">
+          <div>
+            <span class="text-xs font-bold uppercase tracking-wider text-emerald-400">Agmarknet Real-Time Sync</span>
+            <h2 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight mt-1">
+              Live Mandi Price Matrix & Selling Windows
+            </h2>
+          </div>
+          <a href="/market" class="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-400 hover:text-emerald-300 transition-colors">
+            <span>View All Regional Markets</span>
+            <span class="material-symbols-outlined text-sm">north_east</span>
+          </a>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          
+          <!-- Card 1 -->
+          <div class="bg-slate-800/90 rounded-2xl p-5 border border-slate-700/80 shadow-lg space-y-4">
+            <div class="flex justify-between items-start">
+              <div>
+                <span class="px-2 py-0.5 rounded bg-emerald-950 text-emerald-400 text-[10px] font-bold font-mono">PIMPALGAON APMC</span>
+                <h3 class="text-lg font-bold text-white mt-1">Garwa Onion (Summer)</h3>
+              </div>
+              <span class="text-xs font-bold text-emerald-400 bg-emerald-900/50 px-2.5 py-1 rounded-lg">High Demand</span>
+            </div>
+            <div class="flex items-baseline justify-between pt-2">
+              <div>
+                <span class="text-2xl font-black text-white font-mono">₹2,450</span>
+                <span class="text-xs text-slate-400">/ Quintal</span>
+              </div>
+              <span class="text-xs font-bold text-emerald-400">▲ +3.2% Today</span>
+            </div>
+            <div class="p-3 bg-slate-900/80 rounded-xl text-xs space-y-1.5 border border-slate-700/50">
+              <div class="flex justify-between text-slate-400">
+                <span>Recommended Sell Window:</span>
+                <span class="text-emerald-300 font-bold">Next 48 Hours</span>
+              </div>
+              <div class="flex justify-between text-slate-400">
+                <span>Active Bidders:</span>
+                <span class="text-white font-bold">18 Verified Packers</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 2 -->
+          <div class="bg-slate-800/90 rounded-2xl p-5 border border-slate-700/80 shadow-lg space-y-4">
+            <div class="flex justify-between items-start">
+              <div>
+                <span class="px-2 py-0.5 rounded bg-amber-950 text-amber-400 text-[10px] font-bold font-mono">LASALGAON MANDI</span>
+                <h3 class="text-lg font-bold text-white mt-1">Red Onion (Grade-A)</h3>
+              </div>
+              <span class="text-xs font-bold text-amber-400 bg-amber-900/50 px-2.5 py-1 rounded-lg">Moderate</span>
+            </div>
+            <div class="flex items-baseline justify-between pt-2">
+              <div>
+                <span class="text-2xl font-black text-white font-mono">₹2,620</span>
+                <span class="text-xs text-slate-400">/ Quintal</span>
+              </div>
+              <span class="text-xs font-bold text-emerald-400">▲ +1.8% Today</span>
+            </div>
+            <div class="p-3 bg-slate-900/80 rounded-xl text-xs space-y-1.5 border border-slate-700/50">
+              <div class="flex justify-between text-slate-400">
+                <span>Recommended Sell Window:</span>
+                <span class="text-amber-300 font-bold">Hold for 3 Days</span>
+              </div>
+              <div class="flex justify-between text-slate-400">
+                <span>Active Bidders:</span>
+                <span class="text-white font-bold">24 Institutional Buyers</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 3 -->
+          <div class="bg-slate-800/90 rounded-2xl p-5 border border-slate-700/80 shadow-lg space-y-4">
+            <div class="flex justify-between items-start">
+              <div>
+                <span class="px-2 py-0.5 rounded bg-blue-950 text-blue-400 text-[10px] font-bold font-mono">NASHIK CENTRAL</span>
+                <h3 class="text-lg font-bold text-white mt-1">Soyabean (Yellow FAQ)</h3>
+              </div>
+              <span class="text-xs font-bold text-emerald-400 bg-emerald-900/50 px-2.5 py-1 rounded-lg">Peak Rates</span>
+            </div>
+            <div class="flex items-baseline justify-between pt-2">
+              <div>
+                <span class="text-2xl font-black text-white font-mono">₹4,850</span>
+                <span class="text-xs text-slate-400">/ Quintal</span>
+              </div>
+              <span class="text-xs font-bold text-emerald-400">▲ +0.5% Today</span>
+            </div>
+            <div class="p-3 bg-slate-900/80 rounded-xl text-xs space-y-1.5 border border-slate-700/50">
+              <div class="flex justify-between text-slate-400">
+                <span>Recommended Sell Window:</span>
+                <span class="text-emerald-300 font-bold">Immediate Booking</span>
+              </div>
+              <div class="flex justify-between text-slate-400">
+                <span>Active Bidders:</span>
+                <span class="text-white font-bold">12 Oil Mills</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- TRUST & COMPLIANCE BADGES -->
+    <section class="py-12 bg-slate-50 border-b border-slate-200">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <p class="text-center text-xs font-bold uppercase tracking-wider text-slate-400 mb-6">
+          Aligned with National Agricultural Frameworks & Standards
+        </p>
+        <div class="flex flex-wrap items-center justify-center gap-8 opacity-70 grayscale hover:grayscale-0 transition-all duration-300">
+          <div class="flex items-center gap-2 font-bold text-slate-700 text-sm">
+            <span class="material-symbols-outlined text-emerald-700 text-xl">account_balance</span>
+            <span>APMC Act Sec 32A Aligned</span>
+          </div>
+          <div class="flex items-center gap-2 font-bold text-slate-700 text-sm">
+            <span class="material-symbols-outlined text-emerald-700 text-xl">hub</span>
+            <span>e-NAM Portal Integration</span>
+          </div>
+          <div class="flex items-center gap-2 font-bold text-slate-700 text-sm">
+            <span class="material-symbols-outlined text-emerald-700 text-xl">verified</span>
+            <span>Agmarknet Parity Assayed</span>
+          </div>
+          <div class="flex items-center gap-2 font-bold text-slate-700 text-sm">
+            <span class="material-symbols-outlined text-emerald-700 text-xl">security</span>
+            <span>Bank DBT Encrypted Vault</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="w-full bg-slate-950 text-slate-400 py-12 border-t border-slate-800 text-xs">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8 pb-8 border-b border-slate-800">
+        
+        <!-- Col 1 -->
+        <div class="space-y-3">
+          <div class="flex items-center gap-2.5 text-white">
+            <img src="/agrisync-logo.png" alt="AgriSync Logo" class="w-8 h-8 rounded-lg object-contain bg-white p-0.5 border border-emerald-500" />
+            <span class="font-extrabold text-base">AgriSync India</span>
+          </div>
+          <p class="text-slate-400 leading-relaxed text-[11px]">
+            National Mandi Slot Allocation, Crop Intrusion Defense & Institutional Procurement Platform.
+          </p>
+        </div>
+
+        <!-- Col 2 -->
+        <div>
+          <h4 class="text-white font-bold text-xs mb-3 uppercase tracking-wider">Farmer Portal</h4>
+          <ul class="space-y-2 text-[11px]">
+            <li><a href="/dashboard" class="hover:text-emerald-400 transition-colors">Operations Hub</a></li>
+            <li><a href="/alerts" class="hover:text-emerald-400 transition-colors">Risk & Perimeter Alerts</a></li>
+            <li><a href="/produce" class="hover:text-emerald-400 transition-colors">Harvest Lot Batches</a></li>
+            <li><a href="/sell/advisory" class="hover:text-emerald-400 transition-colors">Selling Advisory</a></li>
+          </ul>
+        </div>
+
+        <!-- Col 3 -->
+        <div>
+          <h4 class="text-white font-bold text-xs mb-3 uppercase tracking-wider">APMC & Mandis</h4>
+          <ul class="space-y-2 text-[11px]">
+            <li><a href="/mandi/queue" class="hover:text-emerald-400 transition-colors">Live Yard Queue</a></li>
+            <li><a href="/mandi/gate" class="hover:text-emerald-400 transition-colors">ANPR Gate Security</a></li>
+            <li><a href="/mandi/weighbridge" class="hover:text-emerald-400 transition-colors">Weighbridge Console</a></li>
+            <li><a href="/mandi/quality" class="hover:text-emerald-400 transition-colors">NIR Assayer Tool</a></li>
+          </ul>
+        </div>
+
+        <!-- Col 4 -->
+        <div>
+          <h4 class="text-white font-bold text-xs mb-3 uppercase tracking-wider">Support & Helpdesk</h4>
+          <div class="p-3 bg-slate-900 rounded-xl border border-slate-800 space-y-1">
+            <span class="text-[10px] text-slate-400 block font-medium">APMC National Toll Free</span>
+            <span class="text-emerald-400 font-bold text-sm block font-mono">1800 233 4567</span>
+            <span class="text-[10px] text-slate-400 block">Available 24/7 in Marathi, Hindi & English</span>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="flex flex-col sm:flex-row justify-between items-center gap-4 text-slate-500">
+        <p>© 2026 AgriSync India Federation. All rights reserved under APMC Act standards.</p>
+        <div class="flex items-center gap-4 text-[11px]">
+          <span class="inline-flex items-center gap-1.5 text-emerald-400">
+            <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+            <span>All Mandi Gate Gateways Operational</span>
+          </span>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>

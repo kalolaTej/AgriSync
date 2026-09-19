@@ -1,89 +1,61 @@
-@import "tailwindcss";
-
-@theme {
-  --font-sans: 'Inter', 'Manrope', system-ui, -apple-system, sans-serif;
-  --font-display: 'Manrope', 'Inter', sans-serif;
-
-  --color-olive-50: #f5f8f0;
-  --color-olive-100: #eaefe0;
-  --color-olive-200: #d6e0c2;
-  --color-olive-300: #b7c99a;
-  --color-olive-400: #a3b18a;
-  --color-olive-500: #8faf5a;
-  --color-olive-600: #6b8e23;
-  --color-olive-700: #526f1b;
-  --color-olive-800: #3f5517;
-  --color-olive-900: #2d3d12;
-
-  --color-brand-bg: #fafbf8;
-  --color-brand-surface: #ffffff;
-  --color-brand-border: #e5e7eb;
-  --color-brand-text: #2f2f2f;
-  --color-brand-secondary: #666666;
-  --color-brand-muted: #8a8a8a;
-}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 :root {
-  color-scheme: light;
-  background-color: #fafbf8;
-  color: #2f2f2f;
-  font-family: var(--font-sans);
-  font-size: 16px;
-  line-height: 1.6;
+  --color-green: #166534;
+  --color-emerald: #047857;
+  --color-light: #dcfce7;
+  --color-dark: #0f172a;
 }
 
-body {
-  background-color: #fafbf8;
-  color: #2f2f2f;
-  font-family: var(--font-sans);
-  font-size: 1rem;
+@layer base {
+  html, body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Inter', sans-serif;
+    background-color: #f4fbf7;
+    color: #0f172a;
+  }
+  
+  /* Tabular numbers for financial and weight data */
+  .font-data-tabular {
+    font-feature-settings: "tnum" 1, "cv05" 1;
+  }
 }
 
-.font-data-tabular {
-  font-feature-settings: "tnum" 1, "cv05" 1;
-}
-
-/* 8px spatial rhythm card base */
-.card-base {
-  background-color: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: 12px;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04), 0 1px 2px -1px rgba(0, 0, 0, 0.03);
-  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
-}
-
-.card-base:hover {
-  border-color: #d1d5db;
-  box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.06), 0 2px 4px -2px rgba(0, 0, 0, 0.04);
-}
-
-.card-interactive:hover {
-  transform: translateY(-2px);
-}
-
-/* skeleton shimmer */
-@keyframes shimmer {
-  0% { opacity: 0.55; }
-  50% { opacity: 0.9; }
-  100% { opacity: 0.55; }
-}
-
-.animate-shimmer {
-  animation: shimmer 1.6s infinite ease-in-out;
-}
-
-/* custom scrollbar */
+/* Custom smooth scrollbar using Green-White palette */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #fafbf8;
+  background: #f0fdf4;
 }
 ::-webkit-scrollbar-thumb {
-  background: #d1d5db;
+  background: #047857;
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: #166534;
+}
+
+/* Print Styles: Hide all navigation, sidebar, and buttons so only slip prints */
+@media print {
+  aside, header, nav, footer, .print\:hidden, button, a {
+    display: none !important;
+  }
+  body, main, div {
+    background: #ffffff !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+  }
+  .pl-64 {
+    padding-left: 0 !important;
+  }
+  .max-w-3xl, .max-w-2xl, .max-w-lg {
+    max-width: 100% !important;
+    margin: 0 auto !important;
+  }
 }

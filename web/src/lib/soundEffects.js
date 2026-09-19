@@ -22,7 +22,7 @@ export function playSirenSound(durationSeconds = 3) {
 
     osc.type = 'sawtooth';
 
-    // High-decibel police & deterrence siren sweep (1200Hz <-> 2800Hz)
+    // High-decibel deterrence siren sweep (1200Hz <-> 2800Hz)
     const cycles = Math.max(1, Math.floor(durationSeconds * 3));
     const cycleTime = durationSeconds / cycles;
 

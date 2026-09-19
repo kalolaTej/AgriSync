@@ -1,7 +1,8 @@
+import React from 'react'
 import { Navigate, Outlet } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 
-export default function ProtectedRoute() {
+export default function ProtectedRoute({ children, allowedRoles }) {
   const { user, loading } = useAuth()
 
   if (loading) {
@@ -16,5 +17,9 @@ export default function ProtectedRoute() {
     return <Navigate to="/login" replace />
   }
 
-  return <Outlet />
+  if (allowedRoles && allowedRoles.length > 0 && !allowedRoles.includes(user.role)) {
+    return <Navigate to="/dashboard" replace />
+  }
+
+  return children ? children : <Outlet />
 }

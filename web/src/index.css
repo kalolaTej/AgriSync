@@ -39,6 +39,10 @@ body {
   font-size: 1rem;
 }
 
+.font-data-tabular {
+  font-feature-settings: "tnum" 1, "cv05" 1;
+}
+
 /* 8px spatial rhythm card base */
 .card-base {
   background-color: #ffffff;
@@ -78,8 +82,8 @@ body {
 }
 ::-webkit-scrollbar-thumb {
   background: #d1d5db;
-  border-radius: 3px;
+  border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #a3b18a;
+  background: #94a3b8;
 }

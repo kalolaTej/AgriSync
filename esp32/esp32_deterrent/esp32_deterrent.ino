@@ -142,12 +142,20 @@ void loop() {
   server.handleClient();
   checkSerialInput();
   updateDeterrentState();
+  delay(1); // yield to watchdog timer — prevents WDT reset in simulation
 }
 
 // ----------------------------------------------------
 // Deterrent Trigger Logic
 // ----------------------------------------------------
 void triggerDeterrent(String animal, int durationMs) {
+  // Re-trigger guard: ignore duplicate trigger if already active for same animal
+  if (deterrentActive && currentAnimal == animal) {
+    Serial.print("[DETERRENT] Already active for: ");
+    Serial.println(animal);
+    return;
+  }
+
   deterrentActive = true;
   deterrentStartTime = millis();
   deterrentDurationMs = (durationMs > 0) ? durationMs : 5000;

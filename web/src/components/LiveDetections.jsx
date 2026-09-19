@@ -62,15 +62,12 @@ export default function LiveDetections() {
   }, [session])
 
   useEffect(() => {
+    // Initial load — fetch existing detections from backend
     fetchInitialDetections()
 
-    // automatic polling interval (every 3s) so new detection events pop up live
-    const interval = setInterval(() => {
-      fetchInitialDetections()
-    }, 3000)
-
+    // Supabase Realtime: subscribe to new detection INSERT events for instant live updates
     if (!isSupabaseConfigured) {
-      return () => clearInterval(interval)
+      return
     }
 
     let channel = null
@@ -80,7 +77,7 @@ export default function LiveDetections() {
         .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'detections' }, (payload) => {
           if (payload?.new) {
             const newItem = payload.new
-            setDetections((prev) => [newItem, ...prev])
+            setDetections((prev) => [newItem, ...prev.slice(0, 9)]) // keep max 10 items
             setSelectedStream(newItem)
             playAlertChime()
           }
@@ -91,7 +88,6 @@ export default function LiveDetections() {
     }
 
     return () => {
-      clearInterval(interval)
       try {
         if (channel) supabase.removeChannel(channel)
       } catch {

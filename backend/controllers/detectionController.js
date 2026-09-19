@@ -242,12 +242,16 @@ const cleanupOldDetections = async (maxLimit = 300) => {
 
     const idsToDelete = oldestRecords.map((r) => r.id);
 
-    // extract storage file paths from public urls
+    // extract storage file paths from public urls safely
     const storagePaths = oldestRecords
       .map((r) => {
         if (!r.image_url) return null;
-        const parts = r.image_url.split('/images/');
-        return parts.length > 1 ? parts[1] : null;
+        let cleanUrl = r.image_url.split('?')[0];
+        if (cleanUrl.includes('/images/')) {
+          const parts = cleanUrl.split('/images/');
+          return parts.length > 1 ? decodeURIComponent(parts[1]) : null;
+        }
+        return null;
       })
       .filter(Boolean);
 

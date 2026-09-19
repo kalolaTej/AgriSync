@@ -1,0 +1,77 @@
+{
+  "users": [
+    {
+      "id": "29b9b72f-0d43-4a23-9b04-dc9e14180f2a",
+      "name": "Aayush Farmer",
+      "email": "operator@intrusion.com",
+      "created_at": "2026-09-15T02:54:20.447Z"
+    }
+  ],
+  "farms": [
+    {
+      "id": "29b9b72f-0d43-4a23-9b04-dc9e14180f2a",
+      "user_id": "29b9b72f-0d43-4a23-9b04-dc9e14180f2a",
+      "name": "AgriSync Main Farm",
+      "location": "North Sector Field",
+      "created_at": "2026-09-15T02:54:20.451Z"
+    }
+  ],
+  "cameras": [
+    {
+      "id": "cam_01",
+      "farm_id": "29b9b72f-0d43-4a23-9b04-dc9e14180f2a",
+      "name": "North Perimeter Cam",
+      "zone": "North Field",
+      "status": true,
+      "created_at": "2026-09-15T02:54:20.451Z"
+    },
+    {
+      "id": "cam_02",
+      "farm_id": "29b9b72f-0d43-4a23-9b04-dc9e14180f2a",
+      "name": "East Barn Camera",
+      "zone": "East Barn",
+      "status": true,
+      "created_at": "2026-09-15T02:54:20.451Z"
+    }
+  ],
+  "detections": [
+    {
+      "id": "det-001",
+      "camera_id": "cam_01",
+      "animal": "cow",
+      "confidence": 88,
+      "image_url": "",
+      "detected_at": "2026-09-15T00:54:20.451Z"
+    },
+    {
+      "id": "det-002",
+      "camera_id": "cam_02",
+      "animal": "pig",
+      "confidence": 91,
+      "image_url": "",
+      "detected_at": "2026-09-14T18:54:20.451Z"
+    }
+  ],
+  "crop_loss_incidents": [
+    {
+      "id": "inc-001",
+      "farm_id": "29b9b72f-0d43-4a23-9b04-dc9e14180f2a",
+      "detection_id": "det-001",
+      "crop_type": "Wheat",
+      "affected_area_estimate": "0.4 acres",
+      "notes": "Wheat damage along north boundary fence.",
+      "reported_at": "2026-09-14T21:54:20.451Z",
+      "confirmed_by_farmer": true
+    },
+    {
+      "id": "inc-002",
+      "farm_id": "29b9b72f-0d43-4a23-9b04-dc9e14180f2a",
+      "detection_id": "det-002",
+      "crop_type": "Corn",
+      "affected_area_estimate": "15%",
+      "notes": "Wild boar entry near east barn corner.",
+      "reported_at": "2026-09-14T02:54:20.451Z",
+      "confirmed_by_farmer": true
+    }
+  ]
+}

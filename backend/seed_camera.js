@@ -15,10 +15,14 @@ async function seedCamera() {
     let userId;
     if (uErr || !users) {
       console.log('Inserting default user...');
-      const { data: newUser } = await supabase
+      const { data: newUser, error: insertUserErr } = await supabase
         .from('users')
         .insert([{ name: 'Farm Operator', email: 'operator@intrusion.com' }])
         .select();
+      if (insertUserErr || !newUser || newUser.length === 0) {
+        console.error('❌ Failed to insert default user:', insertUserErr ? insertUserErr.message : 'No data returned');
+        return;
+      }
       userId = newUser[0].id;
     } else {
       userId = users.id;
@@ -32,10 +36,14 @@ async function seedCamera() {
 
     let farmId;
     if (!farms || farms.length === 0) {
-      const { data: newFarm } = await supabase
+      const { data: newFarm, error: insertFarmErr } = await supabase
         .from('farms')
         .insert([{ user_id: userId, name: 'North Perimeter Farm', location: 'Zone A' }])
         .select();
+      if (insertFarmErr || !newFarm || newFarm.length === 0) {
+        console.error('❌ Failed to insert farm:', insertFarmErr ? insertFarmErr.message : 'No data returned');
+        return;
+      }
       farmId = newFarm[0].id;
     } else {
       farmId = farms[0].id;
@@ -49,10 +57,14 @@ async function seedCamera() {
 
     let cameraId;
     if (!cameras || cameras.length === 0) {
-      const { data: newCam } = await supabase
+      const { data: newCam, error: insertCamErr } = await supabase
         .from('cameras')
         .insert([{ farm_id: farmId, name: 'Cam 01 - North Gate', zone: 'North Perimeter', status: true }])
         .select();
+      if (insertCamErr || !newCam || newCam.length === 0) {
+        console.error('❌ Failed to insert camera:', insertCamErr ? insertCamErr.message : 'No data returned');
+        return;
+      }
       cameraId = newCam[0].id;
     } else {
       cameraId = cameras[0].id;

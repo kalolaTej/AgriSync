@@ -13,7 +13,7 @@ WebServer server(80);
 bool deterrentActive = false;
 unsigned long deterrentStartTime = 0;
 unsigned long deterrentDurationMs = 5000;
-String currentAnimal = "";
+String currentAnimal = "";  
 
 // ESP32 LEDC PWM channel for Buzzer (Channel 0)
 const int BUZZER_CHANNEL = 0;
@@ -23,6 +23,7 @@ void playBuzzerTone(int freq) {
   tone(BUZZER_PIN, freq);
 #else
   ledcWriteTone(BUZZER_CHANNEL, freq);
+  ledcWrite(BUZZER_CHANNEL, 128);
 #endif
 }
 
@@ -31,9 +32,11 @@ void stopBuzzerTone() {
   noTone(BUZZER_PIN);
 #else
   ledcWriteTone(BUZZER_CHANNEL, 0);
+  ledcWrite(BUZZER_CHANNEL, 0);
   digitalWrite(BUZZER_PIN, LOW);
 #endif
 }
+
 
 void setup() {
   Serial.begin(115200);

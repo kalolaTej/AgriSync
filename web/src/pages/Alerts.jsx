@@ -66,7 +66,7 @@ export default function Alerts() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ animal: animalName || 'unknown', duration: 5000 }),
-    }).catch(() => {})
+    }).catch(() => { })
   }
 
   const alertList = Array.isArray(alerts) ? alerts : DEFAULT_ALERTS
@@ -137,13 +137,12 @@ export default function Alerts() {
               <div key={alert.id || idx} className="card-base p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div className="flex items-start gap-3.5">
                   <div
-                    className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
-                      isHigh
+                    className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${isHigh
                         ? 'bg-[#FEE2E2] text-[#DC2626]'
                         : isMedium
-                        ? 'bg-[#FEF3C7] text-[#D97706]'
-                        : 'bg-[#EFF6FF] text-[#2563EB]'
-                    }`}
+                          ? 'bg-[#FEF3C7] text-[#D97706]'
+                          : 'bg-[#EFF6FF] text-[#2563EB]'
+                      }`}
                   >
                     <AlertTriangle size={20} />
                   </div>
@@ -152,13 +151,12 @@ export default function Alerts() {
                     <div className="flex items-center gap-2.5">
                       <h3 className="text-sm font-bold text-[#2F2F2F]">{alert.animal || 'Wild Animal'} Intrusion</h3>
                       <span
-                        className={`text-[10px] font-extrabold px-2 py-0.5 rounded ${
-                          isHigh
+                        className={`text-[10px] font-extrabold px-2 py-0.5 rounded ${isHigh
                             ? 'bg-[#FEE2E2] text-[#991B1B]'
                             : isMedium
-                            ? 'bg-[#FEF3C7] text-[#92400E]'
-                            : 'bg-[#EFF6FF] text-[#1E40AF]'
-                        }`}
+                              ? 'bg-[#FEF3C7] text-[#92400E]'
+                              : 'bg-[#EFF6FF] text-[#1E40AF]'
+                          }`}
                       >
                         {alert.severity || 'Medium'} Severity
                       </span>

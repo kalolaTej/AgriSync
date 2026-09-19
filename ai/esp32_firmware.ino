@@ -1,69 +1,38 @@
-/*
-  Smart Non-Invasive Animal Deterrent System - ESP32 Firmware (Universal LED & Siren Fix)
-  Track B: AgriTech - Problem Statement 2
-*/
-
 #include <WiFi.h>
 #include <WebServer.h>
-#include <HardwareSerial.h>
 
-// ==========================================
-// CONFIGURATION & PIN DEFINITIONS
-// ==========================================
-const char* ssid = "Wokwi-GUEST"; // Wi-Fi SSID
-const char* password = "";        // Wi-Fi Password
+const char* ssid = "Wokwi-GUEST";
+const char* password = "";
 
-// Multi-Pin LED Support (Flashes GPIO 2, GPIO 4, and GPIO 13 simultaneously)
-#define STROBE_PIN_4 4     // External Strobe LED Pin (GPIO 4)
-#define STROBE_PIN_13 13   // Secondary LED Pin (GPIO 13)
-#define STATUS_LED_2 2     // Onboard ESP32 Blue LED Pin (GPIO 2)
-#define BUZZER_PIN 18      // Loud Passive Siren Buzzer Pin (GPIO 18)
+#define STROBE_PIN 4     
+#define BUZZER_PIN 18    
+#define STATUS_LED 2    
 
-// DFPlayer Mini Serial Pins (UART2)
-#define DFPLAYER_RX 16
-#define DFPLAYER_TX 17
-
-// Active State Configuration
-// Set to true for Active-HIGH LEDs (HIGH = ON), or false for Active-LOW Relay/LED Modules (LOW = ON)
-const bool LED_ACTIVE_HIGH = true; 
-
-// Global State
 WebServer server(80);
-HardwareSerial dfPlayerSerial(2);
 
 bool deterrentActive = false;
 unsigned long deterrentStartTime = 0;
 unsigned long deterrentDurationMs = 5000;
 String currentAnimal = "";
 
-void sendDFPlayerCommand(uint8_t cmd, uint16_t arg) {
-  uint8_t buf[10];
-  buf[0] = 0x7E; buf[1] = 0xFF; buf[2] = 0x06; buf[3] = cmd; buf[4] = 0x00;
-  buf[5] = (uint8_t)(arg >> 8); buf[6] = (uint8_t)(arg & 0xFF);
-  uint16_t checksum = 0;
-  for (int i = 1; i < 7; i++) checksum += buf[i];
-  checksum = -checksum;
-  buf[7] = (uint8_t)(checksum >> 8); buf[8] = (uint8_t)(checksum & 0xFF); buf[9] = 0xEF;
-  dfPlayerSerial.write(buf, 10);
+// ESP32 LEDC PWM channel for Buzzer (Channel 0)
+const int BUZZER_CHANNEL = 0;
+
+void playBuzzerTone(int freq) {
+#if defined(ESP_ARDUINO_VERSION_MAJOR) && ESP_ARDUINO_VERSION_MAJOR >= 3
+  tone(BUZZER_PIN, freq);
+#else
+  ledcWriteTone(BUZZER_CHANNEL, freq);
+#endif
 }
 
-void playDFPlayerTrack(uint16_t trackNumber) {
-  sendDFPlayerCommand(0x06, 30); // Max Volume 30
-  delay(50);
-  sendDFPlayerCommand(0x03, trackNumber);
-  Serial.print("[DFPlayer] Playing MP3 Track #");
-  Serial.println(trackNumber);
-}
-
-void stopDFPlayer() {
-  sendDFPlayerCommand(0x16, 0);
-}
-
-void setLeds(bool on) {
-  uint8_t state = (on == LED_ACTIVE_HIGH) ? HIGH : LOW;
-  digitalWrite(STROBE_PIN_4, state);
-  digitalWrite(STROBE_PIN_13, state);
-  digitalWrite(STATUS_LED_2, state);
+void stopBuzzerTone() {
+#if defined(ESP_ARDUINO_VERSION_MAJOR) && ESP_ARDUINO_VERSION_MAJOR >= 3
+  noTone(BUZZER_PIN);
+#else
+  ledcWriteTone(BUZZER_CHANNEL, 0);
+  digitalWrite(BUZZER_PIN, LOW);
+#endif
 }
 
 void setup() {
@@ -71,27 +40,19 @@ void setup() {
   delay(1000);
   Serial.println("\n[ESP32] Initializing Smart Farm Deterrent System...");
 
-  // Configure all LED output pins
-  pinMode(STROBE_PIN_4, OUTPUT);
-  pinMode(STROBE_PIN_13, OUTPUT);
-  pinMode(STATUS_LED_2, OUTPUT);
+  pinMode(STROBE_PIN, OUTPUT);
   pinMode(BUZZER_PIN, OUTPUT);
+  pinMode(STATUS_LED, OUTPUT);
 
-  setLeds(false);
+  digitalWrite(STROBE_PIN, LOW);
   digitalWrite(BUZZER_PIN, LOW);
+  digitalWrite(STATUS_LED, LOW);
 
-  // 💡 BOOT HARDWARE TEST: Flash all LEDs 4 times on power-up to confirm physical wiring!
-  Serial.println("[Hardware Test] Flashing LEDs on startup...");
-  for (int i = 0; i < 4; i++) {
-    setLeds(true);
-    delay(200);
-    setLeds(false);
-    delay(200);
-  }
-
-  dfPlayerSerial.begin(9600, SERIAL_8N1, DFPLAYER_RX, DFPLAYER_TX);
-  delay(200);
-  sendDFPlayerCommand(0x06, 30);
+  // Setup ESP32 LEDC PWM for Buzzer audio on GPIO 18 (Wokwi compatible)
+#if !(defined(ESP_ARDUINO_VERSION_MAJOR) && ESP_ARDUINO_VERSION_MAJOR >= 3)
+  ledcSetup(BUZZER_CHANNEL, 2000, 8);
+  ledcAttachPin(BUZZER_PIN, BUZZER_CHANNEL);
+#endif
 
   Serial.print("[WiFi] Connecting to ");
   Serial.println(ssid);
@@ -102,20 +63,18 @@ void setup() {
   while (WiFi.status() != WL_CONNECTED && wifiRetries < 20) {
     delay(500);
     Serial.print(".");
-    setLeds(wifiRetries % 2 == 0);
+    digitalWrite(STATUS_LED, !digitalRead(STATUS_LED));
     wifiRetries++;
   }
 
   if (WiFi.status() == WL_CONNECTED) {
-    setLeds(true);
-    delay(500);
-    setLeds(false);
+    digitalWrite(STATUS_LED, HIGH);
     Serial.println("\n[WiFi] Connected!");
     Serial.print("[WiFi] ESP32 IP Address: ");
     Serial.println(WiFi.localIP());
   } else {
-    Serial.println("\n[WiFi Warning] Operating in SERIAL ONLY mode.");
-    setLeds(false);
+    Serial.println("\n[WiFi Warning] Connection failed. Operating in SERIAL ONLY mode.");
+    digitalWrite(STATUS_LED, LOW);
   }
 
   server.on("/trigger", HTTP_GET, handleTrigger);
@@ -146,24 +105,13 @@ void triggerDeterrent(String animal, int durationMs) {
   Serial.print(" | Duration: ");
   Serial.print(deterrentDurationMs);
   Serial.println("ms");
-
-  if (animal == "pig" || animal == "boar") {
-    playDFPlayerTrack(1);
-  } else if (animal == "cow" || animal == "buffalo" || animal == "horse") {
-    playDFPlayerTrack(2);
-  } else if (animal == "dog" || animal == "cat" || animal == "goat" || animal == "sheep") {
-    playDFPlayerTrack(3);
-  } else {
-    playDFPlayerTrack(4);
-  }
 }
 
 void stopDeterrent() {
   deterrentActive = false;
-  setLeds(false);
-  noTone(BUZZER_PIN);
-  digitalWrite(BUZZER_PIN, LOW);
-  stopDFPlayer();
+  digitalWrite(STROBE_PIN, LOW);
+  digitalWrite(STATUS_LED, WiFi.status() == WL_CONNECTED ? HIGH : LOW);
+  stopBuzzerTone();
   Serial.println("[DETERRENT STOPPED] Hardware silenced.");
 }
 
@@ -175,23 +123,24 @@ void updateDeterrentState() {
     return;
   }
 
-  // Flash all LED pins (GPIO 2, 4, 13) at 150ms intervals for visible strobe effect
+  // Strobe LED Flashing (150ms interval)
   bool flashState = (millis() / 150) % 2 == 0;
-  setLeds(flashState);
+  digitalWrite(STROBE_PIN, flashState ? HIGH : LOW);
+  digitalWrite(STATUS_LED, flashState ? HIGH : LOW);
 
-  // Loud Siren Frequencies (2200 Hz - 3400 Hz)
+  // High-Decibel Siren Frequencies for Wokwi Buzzer (GPIO 18)
   if (currentAnimal == "pig" || currentAnimal == "boar") {
-    int sweepFreq = 2400 + ((millis() / 5) % 1000);
-    tone(BUZZER_PIN, sweepFreq);
+    int sweepFreq = 2400 + ((millis() / 5) % 800);
+    playBuzzerTone(sweepFreq);
   } else if (currentAnimal == "cow" || currentAnimal == "buffalo" || currentAnimal == "horse") {
-    int sirenFreq = ((millis() / 150) % 2 == 0) ? 2800 : 1800;
-    tone(BUZZER_PIN, sirenFreq);
+    int sirenFreq = ((millis() / 200) % 2 == 0) ? 2600 : 1600;
+    playBuzzerTone(sirenFreq);
   } else if (currentAnimal == "dog" || currentAnimal == "cat" || currentAnimal == "goat" || currentAnimal == "sheep") {
-    int pulseFreq = 3000 + ((millis() / 3) % 600);
-    tone(BUZZER_PIN, pulseFreq);
+    int pulseFreq = 2800 + ((millis() / 3) % 500);
+    playBuzzerTone(pulseFreq);
   } else {
-    int genFreq = 2200 + ((millis() / 10) % 1200);
-    tone(BUZZER_PIN, genFreq);
+    int genFreq = 2000 + ((millis() / 10) % 1000);
+    playBuzzerTone(genFreq);
   }
 }
 

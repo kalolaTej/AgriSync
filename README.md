@@ -368,7 +368,7 @@ Developed with pride for **Smart India Hackathon (SIH 2026)**.
 |---|---|
 | **Aayush Barasara** | Pre-Harvest Edge AI, YOLOv8 Vision Pipeline & ESP32 Deterrent Hardware |
 | **Tej Kalola** | Market Intelligence, Agmarknet API Integration, Selling Advisory & Logistics |
-| **Krushn Bagdana** | Post-Harvest Core, OpenCV Grading Microservice & Queue Synchronization |
+| **Krushn Kachhadiya** | Post-Harvest Core, OpenCV Grading Microservice & Queue Synchronization |
 | **Vashishth Baraiya** | Full-Stack Integration, Role-Aware Routing, Navigation & UI System |
 
 ---

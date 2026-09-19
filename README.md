@@ -1,136 +1,95 @@
-# 🌾 AgriSync — Pre-Harvest ("Protect") Module
+# 🌾 AgriSync — "Guard the Harvest. Grow the Value."
 
-> **Real-Time Animal Intrusion Detection, Deterrent Triggering, Crop-Loss Incident Reporting & Intrusion Analytics**  
-> **Author / Lead Developer**: Aayush  
-> **Branch**: `feature/aayush-preharvest-ai`  
-> **Repository**: [https://github.com/kalolaTej/SIH26193.git](https://github.com/kalolaTej/SIH26193.git)
+> **SIH 2026 Problem Statement**: SIH26193  
+> **Repository**: [https://github.com/kalolaTej/SIH26193.git](https://github.com/kalolaTej/SIH26193.git)  
+> **Unified Architecture**: Pre-Harvest Crop Protection + Post-Harvest Quality & Procurement + Market Intelligence & Logistics
 
 ---
 
-## 📌 Project Overview
+## 📌 Platform Overview
 
-**AgriSync** is an end-to-end smart farm protection platform. The **Pre-Harvest ("Protect")** module focuses on crop protection against wild animal intrusions (cows, wild boars, dogs, goats, etc.) using computer vision, automated deterrent hardware, incident reporting, and historical frequency analytics.
+**AgriSync** is an end-to-end agricultural protection, post-harvest quality assurance, procurement, and market intelligence platform.
 
-### Key Capabilities
-- **Real-Time Animal Intrusion Detection**: Powered by YOLO11 object detection running on live camera feeds or Android IP Webcam streams.
-- **Automated Deterrent Controller**: Triggers ESP32 hardware strobes and sirens over Wi-Fi (HTTP), with seamless fallback to high-decibel PC speaker sirens (`winsound`).
-- **Crop-Loss Incident Reporting**: Enables farmers to confirm and quantify crop damage linked to intrusion events or manual field observations.
-- **Intrusion Frequency Analytics**: Aggregates historical intrusion events by perimeter zone and daily time buckets for data-driven farm management.
+### Core Modules:
+1. **🛡️ Pre-Harvest Protection ("Protect")**:
+   - Real-time animal intrusion detection powered by **YOLO11n** edge computer vision.
+   - Automated hardware deterrent controller triggering **ESP32** strobes, sirens, and Wokwi simulation over Wi-Fi with local fallback.
+   - Crop-loss damage incident reporting and zone/period intrusion frequency analytics.
+
+2. **📦 Post-Harvest Quality & Procurement ("Grow")**:
+   - Automated produce grading microservice using **Classical OpenCV Computer Vision** (HSV color analysis, adaptive blemish thresholding, contour shape metrics).
+   - Produce lot lifecycle management (listed, booked, matched, sold).
+   - Procurement centre discovery, time-slot reservation, and live FIFO queue tracking powered by **Socket.IO**.
+   - Procurement transaction tracking and post-harvest incident reporting & analytics.
+
+3. **📈 Market Intelligence & Logistics ("Value")**:
+   - Live APMC mandi price tracking via Government **AGMARKNET / data.gov.in** API with fail-safe mock fallback.
+   - Rule-based **Sale-Window & Spoilage Advisory** calculating price trend momentum, shelf-life urgency, and revenue vs. spoilage.
+   - Rule-based **Buyer & FPO Matching** connecting farmers with verified institutional purchasers.
+   - Cold storage & warehouse logistics suggestion engine with financial ROI calculator.
 
 ---
 
 ## 🏗️ Repository Architecture
 
 ```
-AnimalIntrusionSystem/
+SIH26193/
+├── ai/                                  # Pre-Harvest AI Detection Engine
+│   ├── detect.py                        # YOLO11n detection pipeline
+│   ├── config.py                        # Configuration parser (.env & camera streams)
+│   ├── esp32_controller.py              # ESP32 HTTP trigger & speaker fallback
+│   └── esp32_firmware.ino               # ESP32 C++ firmware (Wokwi simulation)
 │
-├── ai/                                  # AI Detection & Deterrent Controller Engine
-│   ├── detect.py                        # Core YOLO11 detection pipeline & Socket.io upload client
-│   ├── config.py                        # Configuration parser (.env & camera sources)
-│   ├── esp32_controller.py              # Thread-safe ESP32 HTTP trigger & PC sound fallback
-│   ├── esp32_firmware.ino               # ESP32 C++ firmware (Wokwi simulation support)
-│   ├── yolo11n.pt / yolo11s.pt          # Pretrained YOLO model weights
-│   └── test_video/cows.mp4              # Controlled demo video fallback source
+├── esp32/                               # Hardware Deterrent Firmware
+│   └── esp32_deterrent.ino              # Production ESP32 firmware (Strobe & Siren)
 │
-├── esp32/                               # Hardware Firmware Files
-│   └── esp32_deterrent.ino              # Production ESP32 firmware (Strobe GPIO 4, Buzzer GPIO 18)
+├── grading-service/                     # Post-Harvest OpenCV Produce Grading Microservice
+│   ├── main.py                          # FastAPI application (POST /grade)
+│   ├── grading.py                       # Classical OpenCV rule-based grading pipeline
+│   └── requirements.txt                 # Python dependencies (OpenCV, FastAPI, Uvicorn)
 │
-├── backend/                             # Node.js + Express REST API & Socket.io Service
-│   ├── controllers/
-│   │   ├── incidentController.js        # Crop-loss incident reporting & analytics APIs (NEW)
-│   │   ├── detectionController.js       # Ingestion & history of animal detections
-│   │   ├── cameraController.js          # Camera heartbeat & zone management
-│   │   └── farmController.js            # Farm node configuration
-│   ├── migrations/
-│   │   └── 003_crop_loss_incidents.sql  # Database table schema migration (NEW)
-│   ├── routes/
-│   │   ├── incidents.js                 # Incident & Analytics routes (NEW)
-│   │   └── detections.js / cameras.js   # Existing backend API routes
+├── backend/                             # Unified Express REST API & Socket.io Hub
+│   ├── controllers/                     # Pre-Harvest, Post-Harvest & Market Controllers
+│   ├── migrations/                      # Database Schema Migrations (001-004)
+│   ├── routes/                          # REST API Endpoints with RBAC
+│   ├── services/                        # Supabase client, AGMARKNET service, Matching engine
 │   └── server.js                        # Express server entry point & Socket.io hub
 │
-└── web/                                 # React + Vite + Tailwind Web Dashboard
-    └── src/pages/preharvest/
-        ├── IncidentReport.jsx           # Farmer crop-loss incident reporting UI (NEW)
-        └── IncidentAnalytics.jsx        # Intrusion frequency analytics dashboard UI (NEW)
+└── web/                                 # React + Vite + Tailwind CSS Web Dashboard
+    └── src/
+        ├── components/                  # Navigation, Layout & Dashboard components
+        ├── context/AuthContext.jsx      # Authentication & RBAC context
+        └── pages/
+            ├── preharvest/              # Pre-Harvest Incident reporting & analytics
+            ├── produce/                 # Produce lots, OpenCV grading, Procurement, Queue
+            └── market/                  # Mandi prices, Sale-Window, Buyer Matching, Logistics
 ```
-
----
-
-## ⚡ Key Features & API Contracts
-
-### 1. Crop-Loss Incident Reporting (`/api/incidents`)
-
-#### `POST /api/incidents`
-Log a crop-loss incident (optionally linked to a detection event).
-- **Auth**: Authenticated Farmer (JWT)
-- **Request Body**:
-  ```json
-  {
-    "farm_id": "29b9b72f-0d43-4a23-9b04-dc9e14180f2a",
-    "detection_id": "uuid-or-null",
-    "crop_type": "Wheat",
-    "affected_area_estimate": "0.5 acres",
-    "notes": "Damage observed near north boundary fence"
-  }
-  ```
-- **Response (`201 Created`)**:
-  ```json
-  {
-    "id": "ed47bbab-d8c9-4786-a9c5-d6c9d251600e",
-    "farm_id": "29b9b72f-0d43-4a23-9b04-dc9e14180f2a",
-    "detection_id": null,
-    "crop_type": "Wheat",
-    "affected_area_estimate": "0.5 acres",
-    "notes": "Damage observed near north boundary fence",
-    "reported_at": "2026-09-13T17:18:29.393Z",
-    "confirmed_by_farmer": true
-  }
-  ```
-
-#### `GET /api/incidents?farm_id=<uuid>`
-List reported crop-loss incidents for a specific farm.
-- **Response (`200 OK`)**: Array of incident objects.
-
----
-
-### 2. Intrusion Frequency Analytics (`/api/incidents/analytics`)
-
-#### `GET /api/incidents/analytics?farm_id=<uuid>`
-Aggregates historical detection counts grouped by farm zone and daily period.
-- **Response (`200 OK`)**:
-  ```json
-  {
-    "by_zone": [
-      { "zone": "North Field", "count": 12 },
-      { "zone": "East Barn", "count": 7 }
-    ],
-    "by_period": [
-      { "period": "2026-09-12", "count": 3 },
-      { "period": "2026-09-13", "count": 5 }
-    ]
-  }
-  ```
 
 ---
 
 ## 🚀 Getting Started & Local Setup
 
-### 1. Prerequisites
-- **Node.js**: v18+
-- **Python**: v3.9+ with `opencv-python`, `ultralytics`, `requests`, `python-dotenv`
-- **Database**: Supabase / PostgreSQL instance
-
----
-
-### 2. Backend API Setup
+### 1. Backend API Setup
 ```bash
 cd backend
 npm install
 npm run dev
 ```
-*Backend runs on `http://localhost:5000`.*
+*Backend runs on `http://localhost:5000` (Health: `http://localhost:5000/health`)*
 
----
+### 2. Classical OpenCV Grading Microservice Setup
+```bash
+cd grading-service
+python -m venv venv
+# On Windows:
+.\venv\Scripts\activate
+# On Linux/macOS:
+source venv/bin/activate
+
+pip install -r requirements.txt
+uvicorn main:app --host 0.0.0.0 --port 8001 --reload
+```
+*Grading microservice runs on `http://127.0.0.1:8001` (Docs: `http://127.0.0.1:8001/docs`)*
 
 ### 3. Web Dashboard Setup
 ```bash
@@ -138,11 +97,9 @@ cd web
 npm install
 npm run dev
 ```
-*Frontend runs on `http://localhost:5173`.*
+*Frontend runs on `http://localhost:5173`*
 
----
-
-### 4. AI Detection Engine Setup
+### 4. Pre-Harvest AI Detection Engine
 ```bash
 cd ai
 pip install -r requirements.txt
@@ -151,47 +108,33 @@ python detect.py
 
 ---
 
-## 📱 Demo Setup Guide (Demo Day Instructions)
+## 📜 Key API Endpoints Summary
 
-### Option A: Live Android Camera Feed (IP Webcam App)
-1. Install **IP Webcam** on an Android device and tap **Start Server**.
-2. Note the stream URL displayed on phone screen (e.g., `http://192.168.1.50:8080/video`).
-3. Point phone camera at a video screen displaying farm animals.
-4. Set `CAMERA_SOURCE=http://192.168.1.50:8080/video` in `ai/.env` or run:
-   ```bash
-   python detect.py --source http://192.168.1.50:8080/video
-   ```
+### Pre-Harvest & Deterrent Endpoints
+| Method | Endpoint | Description |
+|---|---|---|
+| `POST` | `/api/detections` | Ingest animal intrusion event |
+| `GET` | `/api/detections` | Retrieve detection feed & logs |
+| `POST` | `/api/incidents` | Report pre-harvest crop loss incident |
+| `GET` | `/api/incidents/analytics` | Intrusion frequency by zone & period |
 
-### Option B: Controlled Demo Video Fallback
-If live camera access is limited on demo day, use the included controlled demo video source:
-```bash
-python detect.py --source test_video/cows.mp4
-```
-> *Note: `cows.mp4` is a real sample video included for reproducible testing.*
+### Post-Harvest Quality & Procurement Endpoints
+| Method | Endpoint | Description |
+|---|---|---|
+| `POST` | `/api/lots` | Register produce lot & trigger OpenCV grading |
+| `GET` | `/api/lots` | List farmer produce lots |
+| `GET` | `/api/procurement` | Discover procurement centres |
+| `POST` | `/api/procurement/book-slot` | Reserve procurement time-slot |
+| `GET` | `/api/procurement/queue/:centre_id` | Live FIFO queue status |
+| `GET` | `/api/transactions/:lot_id` | Procurement settlement status |
+| `GET` | `/api/analytics` | Post-harvest KPI metrics |
 
----
-
-## ⚡ ESP32 Deterrent & Wokwi Simulation Setup
-
-### Hardware Pinout Configuration
-- **Strobe LED Pin**: `GPIO 4`
-- **Siren Buzzer Pin**: `GPIO 18`
-- **Status LED Pin**: `GPIO 2`
-- **DFPlayer RX / TX**: `GPIO 16 / GPIO 17`
-- **WiFi SSID**: `Wokwi-GUEST`
-
-### Wokwi Simulator Execution
-1. Open [Wokwi ESP32 Simulator](https://wokwi.com/).
-2. Load firmware from `esp32/esp32_deterrent.ino`.
-3. Set `ESP32_IP=<wokwi_ip>` in `ai/.env`.
-4. When YOLO detects an animal, `detect.py` sends an HTTP GET trigger to `http://<wokwi_ip>/trigger?animal=cow`, activating the flashing LED and buzzer siren frequency. If ESP32 is offline, local PC speaker sirens auto-trigger as fallback.
-
----
-
-## 📜 Commit Standards
-
-Follow conventional commits format:
-- `fix(detect): resolve stride warning and stabilize detection pipeline`
-- `feat(incidents): implement crop-loss incident reporting endpoint and migration`
-- `feat(analytics): add intrusion frequency aggregation endpoint and preharvest pages`
-- `chore(esp32): update firmware with Wokwi hardware simulation pinout and frequencies`
+### Market Intelligence & Logistics Endpoints
+| Method | Endpoint | Description |
+|---|---|---|
+| `GET` | `/api/prices?crop=<crop>&state=<state>` | Mandi commodity prices (`real`/`mock`) |
+| `GET` | `/api/prices/arbitrage?crop=<crop>` | Inter-mandi price spread & arbitrage |
+| `GET` | `/api/lots/:id/sale-window` | Rule-based "Sell Now" / "Hold N Days" decision |
+| `POST` | `/api/sale-window/simulate` | Day-by-day revenue vs spoilage simulation |
+| `GET` | `/api/lots/:id/matches` | Ranked buyer & FPO matches |
+| `GET` | `/api/lots/:id/logistics-suggestion` | Storage facility recommendation & ROI |

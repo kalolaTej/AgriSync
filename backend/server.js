@@ -22,6 +22,9 @@ const mandiRoutes = require('./routes/mandi');
 const saleWindowRoutes = require('./routes/saleWindow');
 const incidentRoutes = require('./routes/incidents');
 const analyticsRoutes = require('./routes/analytics');
+const marketRoutes = require('./routes/market');
+const buyerRoutes = require('./routes/buyers');
+const logisticsRoutes = require('./routes/logistics');
 
 const app = express();
 const server = http.createServer(app);
@@ -70,6 +73,9 @@ app.use('/api', mandiRoutes);
 app.use('/api', saleWindowRoutes);
 app.use('/api', incidentRoutes);
 app.use('/api/analytics', analyticsRoutes);
+app.use('/api', marketRoutes);
+app.use('/api', buyerRoutes);
+app.use('/api', logisticsRoutes);
 
 // health check endpoints
 app.get('/', (req, res) => {
@@ -77,14 +83,14 @@ app.get('/', (req, res) => {
 });
 
 app.get('/health', (req, res) => {
-  res.json({ status: 'ok' });
+  res.json({ status: 'ok', service: 'AgriSync Unified Backend' });
 });
 
 // centralized error handling middleware (must be mounted last)
 app.use(errorHandler);
 
 server.listen(port, () => {
-  console.log(`server running on port ${port}`);
+  console.log(`AgriSync Unified server running on port ${port}`);
 });
 
 // graceful shutdown handling

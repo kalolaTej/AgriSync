@@ -67,7 +67,7 @@ app.use('/api', settingsRoutes);
 app.use('/api', esp32Routes);
 app.use('/api', lotRoutes);
 app.use('/api', procurementRoutes);
-app.use('/api', transactionRoutes);
+app.use('/api/transactions', transactionRoutes);
 app.use('/api', matchingRoutes);
 app.use('/api', mandiRoutes);
 app.use('/api', saleWindowRoutes);

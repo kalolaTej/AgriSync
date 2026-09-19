@@ -13,7 +13,9 @@ import FarmerRegistration from './pages/public/FarmerRegistration';
 // Core Dashboard & Pre-Harvest Pages
 import Dashboard from './pages/Dashboard';
 import Alerts from './pages/preharvest/Alerts';
-import Cameras from './pages/preharvest/Cameras';
+import Cameras from './pages/Cameras';
+import Detections from './pages/Detections';
+import AnimalManagement from './pages/preharvest/AnimalManagement';
 import CropIncidents from './pages/preharvest/CropIncidents';
 import IncidentAnalytics from './pages/preharvest/IncidentAnalytics';
 
@@ -54,247 +56,257 @@ export const App = () => {
           <Route path="/register" element={<FarmerRegistration />} />
 
           {/* Farmer Overview */}
-          <Route 
-            path="/dashboard" 
+          <Route
+            path="/dashboard"
             element={
               <ProtectedRoute allowedRoles={['farmer', 'public', 'apmc', 'buyer', 'driver']}>
                 <DashboardLayout>
                   <Dashboard />
                 </DashboardLayout>
               </ProtectedRoute>
-            } 
+            }
           />
 
           {/* Risk & Field (Animal Intrusion System) */}
-          <Route 
-            path="/alerts" 
+          <Route
+            path="/alerts"
             element={
               <ProtectedRoute allowedRoles={['farmer']}>
                 <DashboardLayout>
                   <Alerts />
                 </DashboardLayout>
               </ProtectedRoute>
-            } 
+            }
           />
-          <Route 
-            path="/cameras" 
+          <Route
+            path="/cameras"
             element={
               <ProtectedRoute allowedRoles={['farmer']}>
                 <DashboardLayout>
                   <Cameras />
                 </DashboardLayout>
               </ProtectedRoute>
-            } 
+            }
           />
-          <Route 
-            path="/detections" 
+          <Route
+            path="/detections"
             element={
               <ProtectedRoute allowedRoles={['farmer']}>
+                <DashboardLayout>
+                  <Detections />
+                </DashboardLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/protect/animals"
+            element={
+              <ProtectedRoute allowedRoles={['farmer']}>
+                <DashboardLayout>
+                  <AnimalManagement />
+                </DashboardLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/protect/incidents"
+            element={
+              <ProtectedRoute allowedRoles={['farmer', 'apmc']}>
                 <DashboardLayout>
                   <CropIncidents />
                 </DashboardLayout>
               </ProtectedRoute>
-            } 
+            }
           />
-          <Route 
-            path="/protect/incidents" 
-            element={
-              <ProtectedRoute allowedRoles={['farmer']}>
-                <DashboardLayout>
-                  <CropIncidents />
-                </DashboardLayout>
-              </ProtectedRoute>
-            } 
-          />
-          <Route 
-            path="/protect/analytics" 
+          <Route
+            path="/protect/analytics"
             element={
               <ProtectedRoute allowedRoles={['farmer']}>
                 <DashboardLayout>
                   <IncidentAnalytics />
                 </DashboardLayout>
               </ProtectedRoute>
-            } 
+            }
           />
 
           {/* Commerce & Mandi */}
-          <Route 
-            path="/produce" 
+          <Route
+            path="/produce"
             element={
               <ProtectedRoute allowedRoles={['farmer']}>
                 <DashboardLayout>
                   <ProduceBatches />
                 </DashboardLayout>
               </ProtectedRoute>
-            } 
+            }
           />
-          <Route 
-            path="/sell/advisory" 
+          <Route
+            path="/sell/advisory"
             element={
               <ProtectedRoute allowedRoles={['farmer']}>
                 <DashboardLayout>
                   <SellingAdvisory />
                 </DashboardLayout>
               </ProtectedRoute>
-            } 
+            }
           />
-          <Route 
-            path="/sell/buyers" 
+          <Route
+            path="/sell/buyers"
             element={
               <ProtectedRoute allowedRoles={['farmer']}>
                 <DashboardLayout>
                   <BuyerMatches />
                 </DashboardLayout>
               </ProtectedRoute>
-            } 
+            }
           />
-          <Route 
-            path="/market" 
+          <Route
+            path="/market"
             element={
               <ProtectedRoute allowedRoles={['farmer', 'public', 'apmc', 'buyer', 'driver']}>
                 <DashboardLayout>
                   <MarketPrices />
                 </DashboardLayout>
               </ProtectedRoute>
-            } 
+            }
           />
-          <Route 
-            path="/market/:id" 
+          <Route
+            path="/market/:id"
             element={
               <ProtectedRoute allowedRoles={['farmer', 'public', 'apmc', 'buyer', 'driver']}>
                 <DashboardLayout>
                   <MarketDetail />
                 </DashboardLayout>
               </ProtectedRoute>
-            } 
+            }
           />
 
           {/* Fulfillment & Finance */}
-          <Route 
-            path="/storage" 
+          <Route
+            path="/storage"
             element={
               <ProtectedRoute allowedRoles={['farmer', 'buyer']}>
                 <DashboardLayout>
                   <StorageDiscovery />
                 </DashboardLayout>
               </ProtectedRoute>
-            } 
+            }
           />
-          <Route 
-            path="/transport" 
+          <Route
+            path="/transport"
             element={
               <ProtectedRoute allowedRoles={['farmer']}>
                 <DashboardLayout>
                   <TransportOptions />
                 </DashboardLayout>
               </ProtectedRoute>
-            } 
+            }
           />
-          <Route 
-            path="/transactions" 
+          <Route
+            path="/transactions"
             element={
               <ProtectedRoute allowedRoles={['farmer']}>
                 <DashboardLayout>
                   <TransactionsSettlements />
                 </DashboardLayout>
               </ProtectedRoute>
-            } 
+            }
           />
-          <Route 
-            path="/transactions/:id" 
+          <Route
+            path="/transactions/:id"
             element={
               <ProtectedRoute allowedRoles={['farmer']}>
                 <DashboardLayout>
                   <TransactionDetail />
                 </DashboardLayout>
               </ProtectedRoute>
-            } 
+            }
           />
-          <Route 
-            path="/settings" 
+          <Route
+            path="/settings"
             element={
               <ProtectedRoute allowedRoles={['farmer', 'apmc', 'buyer', 'driver', 'public']}>
                 <DashboardLayout>
                   <FarmProfileSettings />
                 </DashboardLayout>
               </ProtectedRoute>
-            } 
+            }
           />
 
           {/* APMC Mandi Operator Routes */}
-          <Route 
-            path="/mandi/queue" 
+          <Route
+            path="/mandi/queue"
             element={
               <ProtectedRoute allowedRoles={['apmc', 'farmer', 'driver']}>
                 <DashboardLayout>
                   <LiveQueue />
                 </DashboardLayout>
               </ProtectedRoute>
-            } 
+            }
           />
-          <Route 
-            path="/mandi/gate" 
+          <Route
+            path="/mandi/gate"
             element={
               <ProtectedRoute allowedRoles={['apmc']}>
                 <DashboardLayout>
                   <GateSecurityKiosk />
                 </DashboardLayout>
               </ProtectedRoute>
-            } 
+            }
           />
-          <Route 
-            path="/mandi/weighbridge" 
+          <Route
+            path="/mandi/weighbridge"
             element={
               <ProtectedRoute allowedRoles={['apmc']}>
                 <DashboardLayout>
                   <WeighbridgeConsole />
                 </DashboardLayout>
               </ProtectedRoute>
-            } 
+            }
           />
-          <Route 
-            path="/mandi/quality" 
+          <Route
+            path="/mandi/quality"
             element={
               <ProtectedRoute allowedRoles={['apmc']}>
                 <DashboardLayout>
                   <QualityAssayer />
                 </DashboardLayout>
               </ProtectedRoute>
-            } 
+            }
           />
 
           {/* Buyer Routes */}
-          <Route 
-            path="/buyer/bids" 
+          <Route
+            path="/buyer/bids"
             element={
               <ProtectedRoute allowedRoles={['buyer']}>
                 <DashboardLayout>
                   <InstitutionalBids />
                 </DashboardLayout>
               </ProtectedRoute>
-            } 
+            }
           />
 
           {/* Driver Route */}
-          <Route 
-            path="/driver/gate-pass" 
+          <Route
+            path="/driver/gate-pass"
             element={
               <ProtectedRoute allowedRoles={['driver', 'farmer']}>
                 <DashboardLayout>
                   <DriverGatePass />
                 </DashboardLayout>
               </ProtectedRoute>
-            } 
+            }
           />
 
           {/* Design System Token View */}
-          <Route 
-            path="/design-system" 
+          <Route
+            path="/design-system"
             element={
               <DashboardLayout>
                 <DesignSystemTokens />
               </DashboardLayout>
-            } 
+            }
           />
 
           {/* Catch-all Redirect */}

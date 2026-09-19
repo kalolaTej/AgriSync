@@ -4,12 +4,54 @@ import { Filter, Calendar, Camera, ChevronRight, RefreshCw, Search, ShieldCheck 
 import { useAuth } from '../context/AuthContext'
 import { getAnimalImage, ANIMAL_IMAGES } from '../lib/animalImages'
 
+const DEFAULT_DEMO_DETECTIONS = [
+  {
+    id: 'DET-2026-091',
+    animal: 'pig',
+    camera_id: 'CAM-NORTH-01',
+    camera_name: 'North Perimeter Node #1',
+    farm_name: 'Rajesh Farm (Niphad)',
+    zone: 'North Field - Onion Plot',
+    confidence: null,
+    source: 'demo',
+    status: 'Alert Dispatched',
+    detected_at: new Date(Date.now() - 1000 * 60 * 18).toISOString(),
+    image_url: ''
+  },
+  {
+    id: 'DET-2026-088',
+    animal: 'cow',
+    camera_id: 'CAM-EAST-02',
+    camera_name: 'East Boundary Node #2',
+    farm_name: 'Rajesh Farm (Niphad)',
+    zone: 'East Boundary - Sugarcane',
+    confidence: null,
+    source: 'demo',
+    status: 'Resolved',
+    detected_at: new Date(Date.now() - 1000 * 60 * 85).toISOString(),
+    image_url: ''
+  },
+  {
+    id: 'DET-2026-074',
+    animal: 'horse',
+    camera_id: 'CAM-SOUTH-03',
+    camera_name: 'South Canal Node #3',
+    farm_name: 'Rajesh Farm (Niphad)',
+    zone: 'South Canal Perimeter',
+    confidence: null,
+    source: 'demo',
+    status: 'Logged',
+    detected_at: new Date(Date.now() - 1000 * 60 * 320).toISOString(),
+    image_url: ''
+  }
+];
+
 export default function Detections() {
   const { session } = useAuth()
   const [searchParams] = useSearchParams()
   const initialSearch = searchParams.get('search') || ''
 
-  const [detections, setDetections] = useState([])
+  const [detections, setDetections] = useState(DEFAULT_DEMO_DETECTIONS)
   const [loading, setLoading] = useState(true)
   const [cameraFilter, setCameraFilter] = useState('All')
   const [animalFilter, setAnimalFilter] = useState('All')
@@ -44,14 +86,19 @@ export default function Detections() {
           ? data.detections
           : []
 
-        setDetections((prev) => (page === 1 ? items : [...prev, ...items]))
-        setHasMore(items.length >= limit)
+        if (items.length > 0) {
+          setDetections((prev) => (page === 1 ? items : [...prev, ...items]))
+          setHasMore(items.length >= limit)
+        } else {
+          setDetections((prev) => (prev.length > 0 ? prev : DEFAULT_DEMO_DETECTIONS))
+          setHasMore(false)
+        }
       } else {
-        setDetections([])
+        setDetections((prev) => (prev.length > 0 ? prev : DEFAULT_DEMO_DETECTIONS))
         setHasMore(false)
       }
     } catch {
-      setDetections([])
+      setDetections((prev) => (prev.length > 0 ? prev : DEFAULT_DEMO_DETECTIONS))
       setHasMore(false)
     } finally {
       setLoading(false)
@@ -210,48 +257,82 @@ export default function Detections() {
       ) : (
         <div className="card-base overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs text-[#2F2F2F]">
-              <thead className="bg-[#FAFBF8] border-b border-[#E5E7EB] text-[#666666] font-bold">
+            <table className="w-full text-left border-collapse">
+              <thead className="bg-[#f8fafc] border-b border-slate-200 text-slate-600 font-bold text-[11px] uppercase tracking-wider">
                 <tr>
                   <th className="p-3.5 pl-5">Snapshot</th>
-                  <th className="p-3.5">Detected Species</th>
-                  <th className="p-3.5">Camera / Location Zone</th>
-                  <th className="p-3.5">Confidence Rate</th>
+                  <th className="p-3.5">Species</th>
+                  <th className="p-3.5">Camera Node & Farm</th>
+                  <th className="p-3.5">Detection Zone</th>
+                  <th className="p-3.5">Inference Source / Confidence</th>
+                  <th className="p-3.5">Event Status</th>
                   <th className="p-3.5">Timestamp</th>
                   <th className="p-3.5 pr-5 text-right">Action</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#E5E7EB] bg-white">
+              <tbody className="divide-y divide-slate-100 bg-white">
                 {filteredItems.map((item, idx) => {
                   const imgSrc = getAnimalImage(item?.animal, item?.image_url)
+                  const isRealYolo = item?.source === 'real' || item?.source === 'yolo' || (item?.confidence && item?.source !== 'demo')
                   const isZebra = idx % 2 === 1
 
                   return (
-                    <tr key={item?.id || idx} className={`hover:bg-[#FAFBF8] transition-colors ${isZebra ? 'bg-[#FAFBF8]/40' : ''}`}>
+                    <tr key={item?.id || idx} className={`hover:bg-slate-50 transition-colors ${isZebra ? 'bg-slate-50/50' : ''}`}>
                       <td className="p-3 pl-5">
                         <img
                           src={imgSrc}
                           alt={item?.animal || 'animal'}
                           referrerPolicy="no-referrer"
-                          className="w-11 h-11 object-cover rounded-lg border border-[#E5E7EB] shadow-2xs"
+                          className="w-12 h-12 object-cover rounded-xl border border-slate-200 shadow-2xs"
                           onError={(e) => {
                             e.currentTarget.src = ANIMAL_IMAGES.cow
                           }}
                         />
                       </td>
-                      <td className="p-3 font-bold text-[#2F2F2F] capitalize text-sm">
-                        {item?.animal || 'Animal'}
+                      <td className="p-3">
+                        <span className="font-extrabold text-[#0f172a] capitalize text-sm block">
+                          {item?.animal || 'Animal'}
+                        </span>
+                        <span className="text-[10px] font-mono text-slate-400">ID: {item?.id}</span>
                       </td>
                       <td className="p-3">
-                        <span className="font-semibold text-[#2F2F2F] block text-xs">{item?.zone || item?.camera_name || 'North Zone'}</span>
-                        <span className="block text-[11px] text-[#8A8A8A] font-medium">{item?.camera_id || 'cam_01'}</span>
+                        <span className="font-bold text-[#0f172a] block text-xs">{item?.camera_name || item?.camera_id || 'North Perimeter Node #1'}</span>
+                        <span className="text-[11px] text-slate-500 font-medium">{item?.farm_name || 'Rajesh Farm (Niphad)'}</span>
                       </td>
                       <td className="p-3">
-                        <span className="inline-block px-2.5 py-0.5 rounded-md bg-[#FEF3C7] text-[#D97706] font-extrabold text-[11px]">
-                          {item?.confidence || 90}%
+                        <span className="font-semibold text-[#047857] text-xs block">{item?.zone || 'North Field - Onion Plot'}</span>
+                      </td>
+                      <td className="p-3">
+                        {isRealYolo ? (
+                          <div className="space-y-1">
+                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#dcfce7] text-[#15803d] font-black text-[10px] border border-[#bbf7d0]">
+                              REAL YOLO INFERENCE
+                            </span>
+                            <span className="block text-xs font-black text-[#0f172a] font-data-tabular">
+                              {item?.confidence}% Confidence
+                            </span>
+                          </div>
+                        ) : (
+                          <div className="space-y-1">
+                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 font-extrabold text-[10px] border border-slate-200">
+                              DEMO / SIMULATED
+                            </span>
+                            <span className="block text-[10px] text-slate-400 font-medium">
+                              Simulated Event Log
+                            </span>
+                          </div>
+                        )}
+                      </td>
+                      <td className="p-3">
+                        <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-extrabold ${
+                          item?.status === 'Resolved'
+                            ? 'bg-slate-100 text-slate-700'
+                            : 'bg-red-100 text-red-700 border border-red-200'
+                        }`}>
+                          {item?.status || 'Active Alert'}
                         </span>
                       </td>
-                      <td className="p-3 text-[#666666] font-medium whitespace-nowrap text-xs">
+                      <td className="p-3 text-slate-600 font-medium whitespace-nowrap text-xs">
                         {new Date(item?.created_at || item?.detected_at || Date.now()).toLocaleString([], {
                           dateStyle: 'short',
                           timeStyle: 'short'
@@ -260,7 +341,7 @@ export default function Detections() {
                       <td className="p-3 pr-5 text-right">
                         <Link
                           to={`/detections/${item?.id || 'det_01'}`}
-                          className="inline-flex items-center gap-1 text-[#6B8E23] hover:underline font-bold text-xs"
+                          className="inline-flex items-center gap-1 text-[#047857] hover:underline font-bold text-xs"
                         >
                           <span>Inspect</span>
                           <ChevronRight size={14} />

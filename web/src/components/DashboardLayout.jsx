@@ -20,10 +20,12 @@ export const DashboardLayout = ({ children }) => {
       {
         group: 'Risk & Field (Animal Intrusion)',
         items: [
-          { label: 'Animal Intrusion Alerts', path: '/alerts', icon: 'warning' },
+          { label: 'Intrusion Summary', path: '/protect/analytics', icon: 'analytics' },
+          { label: 'Animal Management', path: '/protect/animals', icon: 'pets' },
           { label: 'Perimeter Cameras', path: '/cameras', icon: 'videocam' },
-          { label: 'Crop Incidents & Protection', path: '/protect/incidents', icon: 'shield_with_heart' },
-          { label: 'Incident Analytics', path: '/protect/analytics', icon: 'analytics' },
+          { label: 'Detection History', path: '/detections', icon: 'history' },
+          { label: 'Intrusion Alerts', path: '/alerts', icon: 'warning' },
+          { label: 'Crop Incidents', path: '/protect/incidents', icon: 'shield_with_heart' },
         ]
       },
       {

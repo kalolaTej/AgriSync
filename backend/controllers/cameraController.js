@@ -1,4 +1,5 @@
 const supabase = require('../services/supabaseClient');
+const localStore = require('../database/localStore');
 
 // in-memory heartbeat tracker for real-time camera online/offline status
 const liveCameraHeartbeats = new Map();
@@ -26,21 +27,27 @@ const updateCameraHeartbeat = async (req, res) => {
 // list cameras with real-time live status based on active heartbeats
 const getCameras = async (req, res) => {
   try {
+    let cameraList = [];
     const { data: cameras, error: cameraError } = await supabase
       .from('cameras')
       .select('*')
       .order('created_at', { ascending: false });
 
     if (cameraError) {
-      return res.status(500).json({ error: cameraError.message });
+      console.warn(`[cameras notice] Supabase offline (${cameraError.message}). Returning localStore items.`);
+      cameraList = localStore.find('cameras') || [];
+    } else {
+      cameraList = cameras || [];
     }
 
-    const cameraList = cameras || [];
+    if (cameraList.length === 0) {
+      cameraList = localStore.find('cameras') || [];
+    }
     const now = Date.now();
 
     const enrichedCameras = cameraList.map((cam) => {
       const lastHeartbeat = liveCameraHeartbeats.get(cam.id);
-      
+
       // Strict online condition: Heartbeat must have been received within the last 15 seconds
       // If no active heartbeat signal has been received, camera is strictly OFFLINE
       const isHeartbeatActive = Boolean(lastHeartbeat && (now - lastHeartbeat < 15000));
@@ -108,11 +115,17 @@ const createCamera = async (req, res) => {
       .single();
 
     if (cameraError) {
+      const localCam = localStore.insert('cameras', {
+        name,
+        zone: zone || 'North Field - Onion Plot',
+        farm_id: targetFarmId || '29b9b72f-0d43-4a23-9b04-dc9e14180f2a',
+        source_url: source_url || '',
+        status: isCamStatusOnline,
+        created_at: new Date().toISOString(),
+      });
       return res.status(201).json({
         data: {
-          id: `cam_${Date.now()}`,
-          name,
-          zone: zone || 'General Zone',
+          ...localCam,
           source_url: source_url || '',
           status: isCamStatusOnline ? 'online' : 'offline',
           fps: isCamStatusOnline ? 24 : 0,

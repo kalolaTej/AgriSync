@@ -1,4 +1,5 @@
 const supabase = require('../services/supabaseClient');
+const localStore = require('../database/localStore');
 const { sendDetectionPush } = require('../services/firebase');
 const { getSystemSettings } = require('./settingsController');
 
@@ -70,11 +71,20 @@ const createDetection = async (req, res) => {
       ])
       .select();
 
-    if (dbError) {
-      return res.status(500).json({ error: `database insertion failed: ${dbError.message}` });
-    }
+    let newDetection = null;
 
-    const newDetection = detectionData ? detectionData[0] : null;
+    if (dbError) {
+      console.warn(`[detections notice] Supabase offline (${dbError.message}). Saving to localStore.`);
+      newDetection = localStore.insert('detections', {
+        camera_id: validCameraId,
+        animal: animal.toLowerCase(),
+        confidence: numericConfidence,
+        image_url: imageUrl,
+        detected_at: detectedAt,
+      });
+    } else {
+      newDetection = detectionData ? detectionData[0] : null;
+    }
 
     if (newDetection) {
       const io = req.app.get('io');
@@ -179,7 +189,25 @@ const getDetections = async (req, res) => {
     const { data, error, count } = await query;
 
     if (error) {
-      return res.status(500).json({ error: error.message });
+      console.warn(`[detections notice] Supabase offline (${error.message}). Returning localStore items.`);
+      let items = localStore.find('detections') || [];
+      if (targetCamera) {
+        items = items.filter(d => d.camera_id === targetCamera);
+      }
+      if (animal) {
+        items = items.filter(d => (d.animal || '').toLowerCase() === animal.toLowerCase());
+      }
+      const total = items.length;
+      const paginated = items.slice(from, to + 1);
+      return res.status(200).json({
+        data: paginated,
+        pagination: {
+          page,
+          limit,
+          total,
+          totalPages: Math.ceil(total / limit) || 1,
+        },
+      });
     }
 
     return res.status(200).json({
@@ -207,6 +235,10 @@ const getDetectionById = async (req, res) => {
       .single();
 
     if (error || !data) {
+      const localItem = (localStore.find('detections', d => d.id === id) || [])[0];
+      if (localItem) {
+        return res.status(200).json({ data: localItem });
+      }
       return res.status(404).json({ error: 'detection not found' });
     }
 

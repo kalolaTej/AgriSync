@@ -40,8 +40,9 @@ const authMiddleware = async (req, res, next) => {
 //   - No roles supplied    → 403 (middleware misconfiguration; never grants access)
 // ---------------------------------------------------------------------------
 const requireRole = (...allowedRoles) => {
+  const roles = allowedRoles.flat();
   // guard against misconfigured call with zero role arguments
-  if (!allowedRoles || allowedRoles.length === 0) {
+  if (!roles || roles.length === 0) {
     // return a middleware that always rejects — never silently grants access
     return (req, res, _next) => {
       console.error('[requireRole] misconfiguration: no allowed roles supplied. denying request.');
@@ -56,7 +57,7 @@ const requireRole = (...allowedRoles) => {
     }
 
     // 403 — user is authenticated but does not hold an allowed role
-    if (!req.user.role || !allowedRoles.includes(req.user.role)) {
+    if (!req.user.role || !roles.includes(req.user.role)) {
       return res.status(403).json({ error: 'Insufficient permissions' });
     }
 
@@ -65,22 +66,8 @@ const requireRole = (...allowedRoles) => {
   };
 };
 
-// ---------------------------------------------------------------------------
-// exports
-//
-// Primary export remains the authMiddleware function so that all existing
-// callers using:
-//   const authMiddleware = require('../middleware/auth');
-// continue to work without any change.
-//
-// requireRole is attached as a named property so new route files can use
-// either of these equivalent patterns:
-//   const authMiddleware = require('../middleware/auth');
-//   authMiddleware.requireRole('farmer')       // property access
-//
-//   const { requireRole } = require('../middleware/auth');  // destructure
-// ---------------------------------------------------------------------------
 module.exports = authMiddleware;
+module.exports.authMiddleware = authMiddleware;
 module.exports.requireRole = requireRole;
 
 // usage examples:

@@ -14,7 +14,14 @@ const farmRoutes = require('./routes/farms');
 const notificationRoutes = require('./routes/notifications');
 const settingsRoutes = require('./routes/settings');
 const esp32Routes = require('./routes/esp32');
+const lotRoutes = require('./routes/lots');
+const procurementRoutes = require('./routes/procurement');
+const transactionRoutes = require('./routes/transactions');
+const matchingRoutes = require('./routes/matching');
+const mandiRoutes = require('./routes/mandi');
+const saleWindowRoutes = require('./routes/saleWindow');
 const incidentRoutes = require('./routes/incidents');
+const analyticsRoutes = require('./routes/analytics');
 
 const app = express();
 const server = http.createServer(app);
@@ -24,7 +31,7 @@ const port = process.env.PORT || 5000;
 const io = new Server(server, {
   cors: {
     origin: '*',
-    methods: ['GET', 'POST'],
+    methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE'],
   },
 });
 
@@ -55,11 +62,18 @@ app.use('/api', farmRoutes);
 app.use('/api', notificationRoutes);
 app.use('/api', settingsRoutes);
 app.use('/api', esp32Routes);
+app.use('/api', lotRoutes);
+app.use('/api', procurementRoutes);
+app.use('/api', transactionRoutes);
+app.use('/api', matchingRoutes);
+app.use('/api', mandiRoutes);
+app.use('/api', saleWindowRoutes);
 app.use('/api', incidentRoutes);
+app.use('/api/analytics', analyticsRoutes);
 
 // health check endpoints
 app.get('/', (req, res) => {
-  res.json({ status: 'ok', message: 'Animal Intrusion Backend API is running' });
+  res.json({ status: 'ok', message: 'AgriSync Unified Backend API is running' });
 });
 
 app.get('/health', (req, res) => {

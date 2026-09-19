@@ -15,10 +15,84 @@ const generateUuid = () => {
   });
 };
 
+const VALID_TYPES = ['damage', 'spoilage', 'rejection', 'procurement_issue', 'queue_issue', 'payment_issue', 'other'];
+const VALID_SEVERITIES = ['low', 'medium', 'high', 'critical'];
+const VALID_STATUS_TRANSITIONS = {
+  'open': ['investigating', 'resolved', 'dismissed'],
+  'investigating': ['resolved', 'dismissed'],
+  'resolved': [],
+  'dismissed': []
+};
+
+// Helper: Emit realtime socket event
+const emitIncidentUpdate = (req, lotId) => {
+  const io = req.app.get('io');
+  if (io) {
+    io.emit('incident-updated', { lot_id: lotId });
+  }
+};
+
+// Unified create incident handler supporting both Pre-Harvest (crop loss) and Post-Harvest (lot incidents)
 const createIncident = async (req, res) => {
   try {
-    const { farm_id, detection_id, crop_type, affected_area_estimate, notes } = req.body;
+    const { lot_id, incident_type, description, severity, farm_id, detection_id, crop_type, affected_area_estimate, notes } = req.body;
+    const userId = req.user?.id;
+    const userRole = req.user?.role;
 
+    // Post-Harvest incident flow (lot_id present)
+    if (lot_id || incident_type) {
+      if (!lot_id || !incident_type || !description || !severity) {
+        return res.status(400).json({ error: 'Missing required fields (lot_id, incident_type, description, severity).' });
+      }
+      if (typeof description === 'string' && description.trim() === '') {
+        return res.status(400).json({ error: 'Description cannot be empty.' });
+      }
+      if (!VALID_TYPES.includes(incident_type)) {
+        return res.status(400).json({ error: 'Invalid incident type.' });
+      }
+      if (!VALID_SEVERITIES.includes(severity)) {
+        return res.status(400).json({ error: 'Invalid severity.' });
+      }
+
+      // Check Lot Ownership if Farmer
+      const { data: lot, error: lotError } = await supabase
+        .from('produce_lots')
+        .select('farms(user_id)')
+        .eq('id', lot_id)
+        .single();
+
+      if (lotError || !lot) {
+        return res.status(404).json({ error: 'Produce lot not found.' });
+      }
+
+      if (userRole === 'farmer' && lot.farms?.user_id !== userId) {
+        return res.status(403).json({ error: 'You do not have access to this lot.' });
+      }
+
+      // Insert Incident
+      const { data: incident, error: insertError } = await supabase
+        .from('incidents')
+        .insert([{
+          lot_id,
+          reported_by: userId,
+          incident_type,
+          description: description.trim(),
+          severity,
+          status: 'open'
+        }])
+        .select()
+        .single();
+
+      if (insertError) {
+        console.error('Error inserting post-harvest incident:', insertError);
+        return res.status(500).json({ error: 'Failed to report incident.' });
+      }
+
+      emitIncidentUpdate(req, lot_id);
+      return res.status(201).json({ data: incident });
+    }
+
+    // Pre-Harvest incident flow (crop loss)
     if (!farm_id || !crop_type || !affected_area_estimate) {
       return res.status(400).json({
         error: 'missing required incident fields (farm_id, crop_type, affected_area_estimate)',
@@ -68,6 +142,7 @@ const createIncident = async (req, res) => {
   }
 };
 
+// Pre-Harvest list incidents
 const getIncidents = async (req, res) => {
   try {
     const { farm_id } = req.query;
@@ -100,6 +175,7 @@ const getIncidents = async (req, res) => {
   }
 };
 
+// Pre-Harvest incident analytics
 const getIncidentAnalytics = async (req, res) => {
   try {
     const { farm_id } = req.query;
@@ -116,7 +192,6 @@ const getIncidentAnalytics = async (req, res) => {
     const items = detections || [];
 
     items.forEach((det) => {
-      // Filter by farm_id if provided
       if (farm_id && det.cameras && det.cameras.farm_id !== farm_id) {
         return;
       }
@@ -143,7 +218,6 @@ const getIncidentAnalytics = async (req, res) => {
         count: periodCounts[p],
       }));
 
-    // Ensure non-empty response defaults for crisp UI presentation
     if (by_zone.length === 0) {
       by_zone.push(
         { zone: 'North Field', count: 12 },
@@ -171,8 +245,122 @@ const getIncidentAnalytics = async (req, res) => {
   }
 };
 
+// Post-Harvest get incidents by lot
+const getIncidentsByLot = async (req, res) => {
+  try {
+    const lotId = req.params.lot_id;
+    const userId = req.user.id;
+    const userRole = req.user.role;
+
+    // Check ownership if farmer
+    const { data: lot, error: lotError } = await supabase
+      .from('produce_lots')
+      .select('farms(user_id)')
+      .eq('id', lotId)
+      .single();
+
+    if (lotError || !lot) {
+      return res.status(404).json({ error: 'Produce lot not found.' });
+    }
+
+    if (userRole === 'farmer' && lot.farms?.user_id !== userId) {
+      return res.status(403).json({ error: 'You do not have access to this lot.' });
+    }
+
+    // Fetch Incidents
+    const { data: incidents, error: fetchError } = await supabase
+      .from('incidents')
+      .select('*, users(name, role)')
+      .eq('lot_id', lotId)
+      .order('created_at', { ascending: false });
+
+    if (fetchError) {
+      console.error('Error fetching incidents:', fetchError);
+      return res.status(500).json({ error: 'Failed to fetch incidents.' });
+    }
+
+    return res.status(200).json({ data: incidents });
+  } catch (error) {
+    console.error('Get incidents error:', error);
+    return res.status(500).json({ error: 'Internal server error.' });
+  }
+};
+
+// Post-Harvest update incident
+const updateIncident = async (req, res) => {
+  try {
+    const incidentId = req.params.id;
+    const { status, resolution_notes, severity } = req.body;
+    const userRole = req.user.role;
+
+    // Only operators and admins can update incidents
+    if (userRole === 'farmer') {
+      return res.status(403).json({ error: 'Insufficient permissions.' });
+    }
+
+    // Fetch existing incident
+    const { data: incident, error: fetchError } = await supabase
+      .from('incidents')
+      .select('*')
+      .eq('id', incidentId)
+      .single();
+
+    if (fetchError || !incident) {
+      return res.status(404).json({ error: 'Incident not found.' });
+    }
+
+    const updates = {};
+    
+    // Validate and update status
+    if (status && status !== incident.status) {
+      const allowedTransitions = VALID_STATUS_TRANSITIONS[incident.status] || [];
+      if (!allowedTransitions.includes(status)) {
+        return res.status(400).json({ error: 'Invalid incident status transition.' });
+      }
+      updates.status = status;
+    }
+
+    // Validate and update severity
+    if (severity && severity !== incident.severity) {
+      if (!VALID_SEVERITIES.includes(severity)) {
+        return res.status(400).json({ error: 'Invalid severity.' });
+      }
+      updates.severity = severity;
+    }
+
+    // Update resolution notes
+    if (resolution_notes !== undefined) {
+      updates.resolution_notes = resolution_notes;
+    }
+    
+    if (Object.keys(updates).length === 0) {
+      return res.status(200).json({ data: incident });
+    }
+
+    const { data: updatedIncident, error: updateError } = await supabase
+      .from('incidents')
+      .update(updates)
+      .eq('id', incidentId)
+      .select()
+      .single();
+
+    if (updateError) {
+      console.error('Error updating incident:', updateError);
+      return res.status(500).json({ error: 'Failed to update incident.' });
+    }
+
+    emitIncidentUpdate(req, updatedIncident.lot_id);
+    return res.status(200).json({ data: updatedIncident });
+  } catch (error) {
+    console.error('Update incident error:', error);
+    return res.status(500).json({ error: 'Internal server error.' });
+  }
+};
+
 module.exports = {
   createIncident,
   getIncidents,
   getIncidentAnalytics,
+  getIncidentsByLot,
+  updateIncident,
 };

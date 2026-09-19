@@ -13,6 +13,19 @@ import Reports from './pages/Reports'
 import Settings from './pages/Settings'
 import NotFound from './pages/NotFound'
 
+import CreateLot from './pages/produce/CreateLot'
+import LotDetail from './pages/produce/LotDetail'
+import ProcurementCentres from './pages/produce/ProcurementCentres'
+import SlotBooking from './pages/produce/SlotBooking'
+import QueueStatus from './pages/produce/QueueStatus'
+import Transactions from './pages/produce/Transactions'
+import MandiPrices from './pages/produce/MandiPrices'
+import BuyerMatches from './pages/produce/BuyerMatches'
+import SaleWindow from './pages/produce/SaleWindow'
+import Incidents from './pages/produce/Incidents'
+import ReportIncident from './pages/produce/ReportIncident'
+import Analytics from './pages/produce/Analytics'
+
 export default function App() {
   return (
     <AuthProvider>
@@ -33,6 +46,18 @@ export default function App() {
               <Route path="/alerts" element={<Alerts />} />
               <Route path="/reports" element={<Reports />} />
               <Route path="/settings" element={<Settings />} />
+              <Route path="/produce/create" element={<CreateLot />} />
+              <Route path="/produce/:id" element={<LotDetail />} />
+              <Route path="/produce/:id/sale-window" element={<SaleWindow />} />
+              <Route path="/produce/:id/incidents" element={<Incidents />} />
+              <Route path="/produce/:id/incidents/report" element={<ReportIncident />} />
+              <Route path="/analytics" element={<Analytics />} />
+              <Route path="/mandi" element={<MandiPrices />} />
+              <Route path="/matches/:lotId" element={<BuyerMatches />} />
+              <Route path="/procurement" element={<ProcurementCentres />} />
+              <Route path="/procurement/:centreId/slots" element={<SlotBooking />} />
+              <Route path="/procurement/:centreId/queue" element={<QueueStatus />} />
+              <Route path="/transactions/:lotId" element={<Transactions />} />
             </Route>
           </Route>
 

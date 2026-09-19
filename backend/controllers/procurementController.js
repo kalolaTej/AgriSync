@@ -175,7 +175,8 @@ const getQueue = async (req, res) => {
       .from('slot_bookings')
       .select(`
         id, slot_id, lot_id, farmer_id, queue_position, status, booked_at,
-        procurement_slots!inner(centre_id, slot_time)
+        procurement_slots!inner(centre_id, slot_time),
+        produce_lots(crop_type, quantity_kg)
       `)
       .eq('procurement_slots.centre_id', centreId)
       .order('queue_position', { ascending: true });
@@ -184,16 +185,7 @@ const getQueue = async (req, res) => {
       return res.status(500).json({ error: `failed to fetch queue: ${error.message}` });
     }
 
-    // Flatten nested slot data out for convenience
-    const formattedQueue = (queue || []).map(entry => {
-      const { procurement_slots, ...rest } = entry;
-      return {
-        ...rest,
-        slot_time: procurement_slots.slot_time
-      };
-    });
-
-    return res.status(200).json({ data: formattedQueue });
+    return res.status(200).json({ data: queue || [] });
   } catch (err) {
     return res.status(500).json({ error: `internal server error: ${err.message}` });
   }

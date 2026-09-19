@@ -5,14 +5,16 @@
  */
 
 const supabase = require('./supabaseClient');
-const { MOCK_MANDI_PRICES } = require('../mock/marketMockData');
+const { MOCK_MANDI_PRICES, MOCK_PRICE_TRENDS, getPastDate } = require('../mock/marketMockData');
 
 const AGMARKNET_RESOURCE_ID = '9ef84268-d588-465a-a308-a864a43d0070';
 const AGMARKNET_BASE_URL = `https://api.data.gov.in/resource/${AGMARKNET_RESOURCE_ID}`;
-const DEFAULT_API_KEY = '579b464db66ec23bdd000001cdd3946e44ce4aad7209ff7b23ac571b';
+const DEFAULT_API_KEY = '579b464db66ec23bdd000001c923c640fc2c477942ab446a95499a8b';
 
-// In-memory runtime cache for quick repeated access and offline resilience
+// In-memory runtime cache with TTL (10 minutes) for live government responses
 const memoryCache = new Map();
+const queryCache = new Map();
+const CACHE_TTL_MS = 10 * 60 * 1000; // 10 minutes
 
 /**
  * Standardize arrival_date string (e.g., "14/09/2026" or "2026-09-14") to "YYYY-MM-DD"
@@ -39,6 +41,12 @@ const parseArrivalDate = (dateStr) => {
  * @returns {Promise<Array>} Array of price objects tagged source: "real"
  */
 const fetchFromGovernmentApi = async ({ crop, state, limit = 50 }) => {
+  const cacheKey = `${crop || 'all'}_${state || 'all'}_${limit}`;
+  const cached = queryCache.get(cacheKey);
+  if (cached && Date.now() - cached.timestamp < CACHE_TTL_MS) {
+    return cached.data;
+  }
+
   const apiKey = process.env.AGMARKNET_API_KEY || DEFAULT_API_KEY;
   const url = new URL(AGMARKNET_BASE_URL);
   url.searchParams.set('api-key', apiKey);
@@ -87,6 +95,7 @@ const fetchFromGovernmentApi = async ({ crop, state, limit = 50 }) => {
       source: 'real',
     }));
 
+    queryCache.set(cacheKey, { data: standardized, timestamp: Date.now() });
     return standardized;
   } catch (err) {
     clearTimeout(timeoutId);
@@ -255,13 +264,17 @@ const getPriceTrend = async ({ crop, market }) => {
   }
 
   if (trendRecords.length < 2) {
-    const mockMatches = getMockFallbackPrices({ crop, market });
-    mockMatches.sort((a, b) => new Date(a.price_date) - new Date(b.price_date));
-    trendRecords = mockMatches.map((m) => ({
-      price_date: m.price_date,
-      modal_price: m.modal_price,
-      source: 'mock',
-    }));
+    if (MOCK_PRICE_TRENDS[crop]) {
+      trendRecords = [...MOCK_PRICE_TRENDS[crop]];
+    } else {
+      const mockMatches = getMockFallbackPrices({ crop, market });
+      mockMatches.sort((a, b) => new Date(a.price_date) - new Date(b.price_date));
+      trendRecords = mockMatches.map((m) => ({
+        price_date: m.price_date,
+        modal_price: m.modal_price,
+        source: 'mock',
+      }));
+    }
   }
 
   return trendRecords;

@@ -164,8 +164,8 @@ export default function DashboardLayout() {
         <aside
           className={`bg-white border-r border-[#E5E7EB] transition-all duration-300 ease-in-out z-30 flex flex-col justify-between ${
             mobileDrawerOpen
-              ? 'fixed inset-y-0 left-0 w-72 pt-16 shadow-2xl translate-x-0'
-              : 'fixed inset-y-0 left-0 w-72 pt-16 -translate-x-full md:translate-x-0 md:static md:pt-0'
+              ? 'fixed inset-y-0 left-0 w-72 pt-16 shadow-2xl translate-x-0 z-50'
+              : 'fixed inset-y-0 left-0 w-72 pt-16 -translate-x-full md:translate-x-0 md:sticky md:top-16 md:h-[calc(100vh-4rem)] md:self-start md:pt-0'
           } ${
             sidebarOpen ? 'md:w-68' : 'md:w-20'
           }`}

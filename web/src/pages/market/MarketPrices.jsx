@@ -17,7 +17,11 @@ import {
   Sparkles,
   MapPin,
   CircleDollarSign,
-  ListFilter
+  ListFilter,
+  ChevronDown,
+  ChevronUp,
+  Globe2,
+  Info
 } from 'lucide-react'
 import { API_BASE_URL } from '../../lib/api'
 
@@ -31,6 +35,7 @@ export default function MarketPrices() {
   const [trendData, setTrendData] = useState([])
   const [loadingTrend, setLoadingTrend] = useState(false)
   const [activeTab, setActiveTab] = useState('table') // 'table' | 'arbitrage' | 'trend' | 'alert'
+  const [visibleCount, setVisibleCount] = useState(8) // View More APMCs expander
   
   // Arbitrage Data
   const [arbitrageData, setArbitrageData] = useState(null)
@@ -45,7 +50,7 @@ export default function MarketPrices() {
   ])
 
   const popularCrops = ['Tomato', 'Wheat', 'Onion', 'Potato', 'Rice', 'Soybean', 'Cotton', 'Cabbage', 'Bitter gourd', 'Bajra(Pearl Millet/Cumbu)']
-  const majorStates = ['All States', 'Andhra Pradesh', 'Maharashtra', 'Madhya Pradesh', 'Haryana', 'Uttar Pradesh', 'Gujarat', 'Keralam', 'Punjab', 'Rajasthan', 'Tripura', 'Odisha']
+  const majorStates = ['All States', 'Andhra Pradesh', 'Maharashtra', 'Madhya Pradesh', 'Haryana', 'Uttar Pradesh', 'Gujarat', 'Karnataka', 'Punjab', 'Rajasthan', 'Tamil Nadu', 'Telangana', 'West Bengal', 'Delhi', 'Bihar', 'Odisha', 'Chhattisgarh']
 
   const fetchPrices = useCallback(async () => {
     setLoading(true)
@@ -192,13 +197,25 @@ export default function MarketPrices() {
 
         <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">data.gov.in Live</span>
-            <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-100 text-emerald-800">
-              Verified Real
+            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+              {realCount > 0 ? 'data.gov.in Live' : 'Data Mode'}
             </span>
+            {realCount > 0 ? (
+              <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-100 text-emerald-800">
+                Verified Real
+              </span>
+            ) : (
+              <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold bg-amber-100 text-amber-800">
+                Demo Fallback
+              </span>
+            )}
           </div>
-          <div className="mt-2 text-2xl font-black text-emerald-700">{realCount}</div>
-          <p className="text-xs text-slate-500 mt-1">Live records from AGMARKNET API</p>
+          <div className={`mt-2 text-2xl font-black ${realCount > 0 ? 'text-emerald-700' : 'text-amber-800'}`}>
+            {realCount > 0 ? `${realCount} Live` : `${prices.length} APMCs`}
+          </div>
+          <p className="text-xs text-slate-500 mt-1">
+            {realCount > 0 ? 'Live AGMARKNET arrivals' : 'Simulated APMC rates across states'}
+          </p>
         </div>
 
         <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs">
@@ -337,16 +354,21 @@ export default function MarketPrices() {
       ) : activeTab === 'table' ? (
         /* TABLE VIEW */
         <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
-          <div className="px-6 py-4 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+          <div className="px-6 py-4 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 bg-slate-50/50">
             <div>
-              <h2 className="text-base font-bold text-slate-900">
-                Market Arrivals for {selectedCrop} ({filteredPrices.length} records)
+              <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
+                <span>Market Arrivals for {selectedCrop}</span>
+                <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-slate-200 text-slate-800">
+                  {filteredPrices.length} APMCs
+                </span>
               </h2>
-              <p className="text-xs text-slate-500">Unit: ₹ per Quintal (100 kg)</p>
+              <p className="text-xs text-slate-500 mt-0.5">
+                Unit: ₹ per Quintal (100 kg) • Across {new Set(filteredPrices.map((p) => p.state)).size} Indian states
+              </p>
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-xs font-semibold px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700">
-                Sorted by Arrival Date
+              <span className="text-xs font-semibold px-2.5 py-1 rounded-lg bg-white border border-slate-200 text-slate-700 shadow-xs">
+                {selectedState ? `Filtered: ${selectedState}` : 'All States Mandis'}
               </span>
             </div>
           </div>
@@ -358,48 +380,100 @@ export default function MarketPrices() {
               <p className="text-xs text-slate-400 mt-1">Try selecting a different commodity or state from the filter bar above.</p>
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-sm text-slate-600">
-                <thead className="bg-slate-50 text-slate-700 text-xs font-bold uppercase tracking-wider border-b border-slate-200">
-                  <tr>
-                    <th className="px-6 py-4">Commodity</th>
-                    <th className="px-6 py-4">Mandi / APMC</th>
-                    <th className="px-6 py-4">State</th>
-                    <th className="px-6 py-4 text-right">Min Rate</th>
-                    <th className="px-6 py-4 text-right">Max Rate</th>
-                    <th className="px-6 py-4 text-right font-black text-slate-900">Modal Rate</th>
-                    <th className="px-6 py-4">Arrival Date</th>
-                    <th className="px-6 py-4">Data Source</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-200">
-                  {filteredPrices.map((p, idx) => (
-                    <tr key={`${p.market_name}-${p.price_date}-${idx}`} className="hover:bg-slate-50/80 transition-colors">
-                      <td className="px-6 py-4 font-bold text-slate-900">{p.crop_type}</td>
-                      <td className="px-6 py-4 text-slate-800 font-semibold">{p.market_name}</td>
-                      <td className="px-6 py-4 text-slate-600">{p.state}</td>
-                      <td className="px-6 py-4 text-right font-medium">₹{parseFloat(p.min_price || 0).toLocaleString('en-IN')}</td>
-                      <td className="px-6 py-4 text-right font-medium">₹{parseFloat(p.max_price || 0).toLocaleString('en-IN')}</td>
-                      <td className="px-6 py-4 text-right font-black text-emerald-700 text-base">
-                        ₹{parseFloat(p.modal_price || 0).toLocaleString('en-IN')}
-                      </td>
-                      <td className="px-6 py-4 text-xs text-slate-500 font-mono">{p.price_date}</td>
-                      <td className="px-6 py-4">
-                        {p.source === 'real' ? (
-                          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
-                            <CheckCircle2 className="w-3 h-3" /> data.gov.in
-                          </span>
-                        ) : (
-                          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-amber-100 text-amber-800 border border-amber-300">
-                            Demo Data
-                          </span>
-                        )}
-                      </td>
+            <>
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-sm text-slate-600">
+                  <thead className="bg-slate-50 text-slate-700 text-xs font-bold uppercase tracking-wider border-b border-slate-200">
+                    <tr>
+                      <th className="px-6 py-4">Commodity</th>
+                      <th className="px-6 py-4">Mandi / APMC</th>
+                      <th className="px-6 py-4">State</th>
+                      <th className="px-6 py-4 text-right">Min Rate</th>
+                      <th className="px-6 py-4 text-right">Max Rate</th>
+                      <th className="px-6 py-4 text-right font-black text-slate-900">Modal Rate</th>
+                      <th className="px-6 py-4">Arrival Date</th>
+                      <th className="px-6 py-4">Data Source</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                  </thead>
+                  <tbody className="divide-y divide-slate-200">
+                    {filteredPrices.slice(0, visibleCount).map((p, idx) => (
+                      <tr key={`${p.market_name}-${p.price_date}-${idx}`} className="hover:bg-slate-50/80 transition-colors">
+                        <td className="px-6 py-4 font-bold text-slate-900">{p.crop_type}</td>
+                        <td className="px-6 py-4 text-slate-800 font-semibold">{p.market_name}</td>
+                        <td className="px-6 py-4 text-slate-600">
+                          <span className="inline-flex items-center gap-1.5">
+                            <MapPin className="w-3.5 h-3.5 text-slate-400" />
+                            {p.state}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 text-right font-medium text-slate-600">
+                          ₹{parseFloat(p.min_price || 0).toLocaleString('en-IN')}
+                        </td>
+                        <td className="px-6 py-4 text-right font-medium text-slate-600">
+                          ₹{parseFloat(p.max_price || 0).toLocaleString('en-IN')}
+                        </td>
+                        <td className="px-6 py-4 text-right font-black text-emerald-700 text-base">
+                          ₹{parseFloat(p.modal_price || 0).toLocaleString('en-IN')}
+                        </td>
+                        <td className="px-6 py-4 text-xs text-slate-500 font-mono">{p.price_date}</td>
+                        <td className="px-6 py-4">
+                          {p.source === 'real' ? (
+                            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                              <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                              data.gov.in (Live)
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-amber-100 text-amber-800 border border-amber-300">
+                              <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+                              Demo Data
+                            </span>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* VIEW MORE APMCS CONTROLS */}
+              <div className="px-6 py-4 bg-slate-50/80 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-600">
+                <div className="font-medium text-slate-700">
+                  Showing <span className="font-bold text-slate-900">{Math.min(visibleCount, filteredPrices.length)}</span> of{' '}
+                  <span className="font-bold text-slate-900">{filteredPrices.length}</span> APMC mandis across{' '}
+                  <span className="font-bold text-slate-900">{new Set(filteredPrices.map((p) => p.state)).size}</span> states
+                </div>
+
+                <div className="flex items-center gap-2">
+                  {filteredPrices.length > visibleCount && (
+                    <>
+                      <button
+                        onClick={() => setVisibleCount((prev) => Math.min(prev + 8, filteredPrices.length))}
+                        className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl font-bold bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs transition-colors"
+                      >
+                        <ChevronDown className="w-4 h-4" />
+                        <span>View More APMCs (+{Math.min(8, filteredPrices.length - visibleCount)})</span>
+                      </button>
+                      <button
+                        onClick={() => setVisibleCount(filteredPrices.length)}
+                        className="inline-flex items-center gap-1 px-3 py-2 rounded-xl font-bold border border-slate-300 bg-white hover:bg-slate-100 text-slate-700 shadow-xs transition-colors"
+                      >
+                        <span>View All ({filteredPrices.length})</span>
+                      </button>
+                    </>
+                  )}
+
+                  {visibleCount > 8 && (
+                    <button
+                      onClick={() => setVisibleCount(8)}
+                      className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl font-bold border border-slate-300 bg-white hover:bg-slate-100 text-slate-700 shadow-xs transition-colors"
+                    >
+                      <ChevronUp className="w-4 h-4" />
+                      <span>Show Less (Collapse)</span>
+                    </button>
+                  )}
+                </div>
+              </div>
+            </>
           )}
         </div>
       ) : activeTab === 'arbitrage' ? (

@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import LanguageSwitcher from '../../components/LanguageSwitcher';
 
 export const FarmerRegistration = () => {
   const navigate = useNavigate();
-  const { registerUser } = useAuth();
+  const { registerUser, t } = useAuth();
 
   const [formData, setFormData] = useState({
     fullName: 'Rajesh Tukaram Patil',
@@ -82,12 +83,15 @@ export const FarmerRegistration = () => {
       <div className="max-w-3xl mx-auto">
         {/* Header Branding */}
         <div className="text-center mb-8">
+          <div className="flex justify-center mb-3">
+            <LanguageSwitcher size="sm" />
+          </div>
           <Link to="/" className="inline-flex items-center gap-3 mb-3">
             <img src="/agrisync-logo.png" alt="AgriSync Logo" className="w-14 h-14 rounded-2xl object-contain shadow-md bg-white p-1 border border-[#dcfce7]" />
             <span className="text-3xl font-black text-[#166534] tracking-tight">AgriSync</span>
           </Link>
-          <h1 className="text-2xl font-extrabold text-[#0f172a]">User Onboarding & Role e-KYC Registration</h1>
-          <p className="text-xs text-slate-600 mt-1">Select your platform role and verify credentials for direct Mandi queue slots, NIR quality certificates, and escrow payments.</p>
+          <h1 className="text-2xl font-extrabold text-[#0f172a]">{t('auth.onboardingTitle', 'User Onboarding & Role e-KYC Registration')}</h1>
+          <p className="text-xs text-slate-600 mt-1">{t('auth.onboardingSubtitle', 'Select your platform role and verify credentials for direct Mandi queue slots, NIR quality certificates, and escrow payments.')}</p>
         </div>
 
         {submitted ? (
@@ -95,9 +99,9 @@ export const FarmerRegistration = () => {
             <div className="w-16 h-16 rounded-full bg-[#dcfce7] text-[#047857] flex items-center justify-center mx-auto">
               <span className="material-symbols-outlined text-3xl">check_circle</span>
             </div>
-            <h2 className="text-xl font-extrabold text-[#0f172a]">e-KYC Account Created Successfully!</h2>
+            <h2 className="text-xl font-extrabold text-[#0f172a]">{t('auth.accountSuccess', 'e-KYC Account Created Successfully!')}</h2>
             <p className="text-xs text-slate-600">
-              Registered as <strong className="text-[#047857] uppercase font-bold">{formData.role}</strong>. Redirecting to your AgriSync Workspace...
+              {t('auth.redirecting', 'Redirecting to your AgriSync Workspace...')}
             </p>
           </div>
         ) : (
@@ -106,14 +110,14 @@ export const FarmerRegistration = () => {
             {/* Role Selection Box */}
             <div className="bg-[#f0fdf4] border-2 border-[#047857] p-5 rounded-2xl space-y-3">
               <label className="block text-xs font-black uppercase text-[#166534] tracking-wider">
-                Select Platform Account Role *
+                {t('auth.selectRole', 'Select Platform Account Role *')}
               </label>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
                 <label className={`p-3 rounded-xl border-2 flex items-center gap-3 cursor-pointer transition-all ${formData.role === 'farmer' ? 'bg-[#047857] text-white border-[#047857] font-bold shadow-xs' : 'bg-white text-slate-800 border-slate-200 hover:border-[#047857]'}`}>
                   <input type="radio" name="role" value="farmer" checked={formData.role === 'farmer'} onChange={(e) => setFormData({...formData, role: e.target.value})} className="hidden" />
                   <span className="material-symbols-outlined text-xl">agriculture</span>
                   <div>
-                    <div className="font-extrabold">Farmer Producer (FPO)</div>
+                    <div className="font-extrabold">{t('role.farmer', 'Farmer Producer (FPO)')}</div>
                     <div className="text-[10px] opacity-80">Produce, Mandi slots, Sale Advisory</div>
                   </div>
                 </label>
@@ -122,7 +126,7 @@ export const FarmerRegistration = () => {
                   <input type="radio" name="role" value="apmc" checked={formData.role === 'apmc'} onChange={(e) => setFormData({...formData, role: e.target.value})} className="hidden" />
                   <span className="material-symbols-outlined text-xl">warehouse</span>
                   <div>
-                    <div className="font-extrabold">APMC Mandi Official</div>
+                    <div className="font-extrabold">{t('role.apmc', 'APMC Mandi Official')}</div>
                     <div className="text-[10px] opacity-80">Queue, ANPR Gate, Weighbridge, Assayer</div>
                   </div>
                 </label>
@@ -131,7 +135,7 @@ export const FarmerRegistration = () => {
                   <input type="radio" name="role" value="buyer" checked={formData.role === 'buyer'} onChange={(e) => setFormData({...formData, role: e.target.value})} className="hidden" />
                   <span className="material-symbols-outlined text-xl">storefront</span>
                   <div>
-                    <div className="font-extrabold">Institutional Buyer</div>
+                    <div className="font-extrabold">{t('role.buyer', 'Institutional Buyer')}</div>
                     <div className="text-[10px] opacity-80">Purchase Orders, Direct Bids, Escrow</div>
                   </div>
                 </label>
@@ -140,7 +144,7 @@ export const FarmerRegistration = () => {
                   <input type="radio" name="role" value="driver" checked={formData.role === 'driver'} onChange={(e) => setFormData({...formData, role: e.target.value})} className="hidden" />
                   <span className="material-symbols-outlined text-xl">local_shipping</span>
                   <div>
-                    <div className="font-extrabold">Logistics Drayage Driver</div>
+                    <div className="font-extrabold">{t('role.driver', 'Logistics Drayage Driver')}</div>
                     <div className="text-[10px] opacity-80">Fast-Track Gate Pass & Yard Entry</div>
                   </div>
                 </label>
@@ -149,13 +153,13 @@ export const FarmerRegistration = () => {
 
             <div className="border-b border-slate-100 pb-4">
               <h2 className="text-base font-extrabold text-[#0f172a] flex items-center gap-2">
-                <span className="material-symbols-outlined text-[#047857]">badge</span> Identity Information
+                <span className="material-symbols-outlined text-[#047857]">badge</span> {t('auth.identityInfo', 'Identity Information')}
               </h2>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Full Registered Name *</label>
+                <label className="block text-xs font-bold text-slate-700 mb-1">{t('auth.fullName', 'Full Registered Name *')}</label>
                 <input 
                   type="text" 
                   value={formData.fullName}
@@ -166,7 +170,7 @@ export const FarmerRegistration = () => {
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Mobile Number (10 Digits) *</label>
+                <label className="block text-xs font-bold text-slate-700 mb-1">{t('auth.mobileNumber', 'Mobile Number (10 Digits) *')}</label>
                 <input 
                   type="tel" 
                   value={formData.mobile}
@@ -177,7 +181,7 @@ export const FarmerRegistration = () => {
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Aadhaar Card Number (12 Digits) *</label>
+                <label className="block text-xs font-bold text-slate-700 mb-1">{t('auth.aadhaar', 'Aadhaar Card Number (12 Digits) *')}</label>
                 <input 
                   type="text" 
                   value={formData.aadhaar}
@@ -204,13 +208,13 @@ export const FarmerRegistration = () => {
 
             <div className="border-b border-slate-100 pb-4 pt-2">
               <h2 className="text-base font-extrabold text-[#0f172a] flex items-center gap-2">
-                <span className="material-symbols-outlined text-[#047857]">account_balance</span> Bank Account for Direct Escrow DBT
+                <span className="material-symbols-outlined text-[#047857]">account_balance</span> {t('auth.bankEscrowInfo', 'Bank Account for Direct Escrow DBT')}
               </h2>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Bank Account Number *</label>
+                <label className="block text-xs font-bold text-slate-700 mb-1">{t('auth.bankAccount', 'Bank Account Number *')}</label>
                 <input 
                   type="text" 
                   value={formData.bankAccount}
@@ -221,7 +225,7 @@ export const FarmerRegistration = () => {
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Bank IFSC Code *</label>
+                <label className="block text-xs font-bold text-slate-700 mb-1">{t('auth.ifsc', 'Bank IFSC Code *')}</label>
                 <input 
                   type="text" 
                   value={formData.ifsc}
@@ -234,13 +238,13 @@ export const FarmerRegistration = () => {
 
             <div className="border-b border-slate-100 pb-4 pt-2">
               <h2 className="text-base font-extrabold text-[#0f172a] flex items-center gap-2">
-                <span className="material-symbols-outlined text-[#047857]">lock</span> Account Security
+                <span className="material-symbols-outlined text-[#047857]">lock</span> {t('auth.accountSecurity', 'Account Security')}
               </h2>
             </div>
 
             <div className="grid grid-cols-1 gap-4">
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Create Password *</label>
+                <label className="block text-xs font-bold text-slate-700 mb-1">{t('auth.createPassword', 'Create Password *')}</label>
                 <input 
                   type="password" 
                   value={formData.password || ''}
@@ -252,12 +256,12 @@ export const FarmerRegistration = () => {
             </div>
 
             <div className="pt-4 flex items-center justify-between">
-              <Link to="/" className="text-xs font-bold text-slate-500 hover:text-[#0f172a]">Cancel</Link>
+              <Link to="/" className="text-xs font-bold text-slate-500 hover:text-[#0f172a]">{t('common.cancel', 'Cancel')}</Link>
               <button 
                 type="submit" 
-                className="px-6 py-2.5 bg-[#047857] text-white hover:bg-[#065f46] font-extrabold text-xs rounded-xl shadow-md transition-all flex items-center gap-2"
+                className="px-6 py-2.5 bg-[#047857] text-white hover:bg-[#065f46] font-extrabold text-xs rounded-xl shadow-md transition-all flex items-center gap-2 cursor-pointer"
               >
-                <span className="material-symbols-outlined text-base">verified_user</span> Register Account & Launch Workspace
+                <span className="material-symbols-outlined text-base">verified_user</span> {t('auth.registerNow', 'Register Account & Launch Workspace')}
               </button>
             </div>
           </form>
@@ -268,3 +272,4 @@ export const FarmerRegistration = () => {
 };
 
 export default FarmerRegistration;
+

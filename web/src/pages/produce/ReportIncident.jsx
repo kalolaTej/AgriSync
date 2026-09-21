@@ -1,3 +1,4 @@
+import { API_BASE_URL, SOCKET_URL } from '../../lib/api';
 import { useState } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { ArrowLeft, AlertTriangle, Loader2 } from 'lucide-react'
@@ -15,7 +16,7 @@ export default function ReportIncident() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
-  const backendUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000'
+  const backendUrl = API_BASE_URL;
 
   const handleSubmit = async (e) => {
     e.preventDefault()

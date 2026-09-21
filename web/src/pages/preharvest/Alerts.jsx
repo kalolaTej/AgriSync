@@ -1,3 +1,4 @@
+import { API_BASE_URL, SOCKET_URL } from '../../lib/api';
 import React, { useState, useEffect } from 'react';
 import { AlertTriangle, CheckCircle2, Volume2, Filter, VolumeX, Eye, ShieldAlert, Check } from 'lucide-react';
 import { playSirenSound } from '../../lib/soundEffects';
@@ -67,7 +68,7 @@ export default function Alerts() {
   useEffect(() => {
     const fetchBackendNotifications = async () => {
       try {
-        const backendUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+        const backendUrl = API_BASE_URL;
         const res = await fetch(`${backendUrl}/api/notifications`);
         if (res.ok) {
           const data = await res.json();
@@ -117,9 +118,18 @@ export default function Alerts() {
     });
   };
 
-  const handleSirenClick = (animalName) => {
+  const handleSirenClick = async (animalName) => {
     playSirenSound(3.5);
     setSirenActiveToast(`🚨 High-Decibel Siren Activated for ${animalName || 'Wild Animal'}! Automated ultrasonic deterrent dispatched.`);
+    try {
+      const backendUrl = API_BASE_URL;
+      await fetch(`${backendUrl}/api/siren/trigger`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ animal: animalName || 'wild_boar', force: true }),
+      });
+    } catch (e) {}
+
     setTimeout(() => {
       setSirenActiveToast(null);
     }, 3800);

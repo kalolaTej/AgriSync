@@ -1,3 +1,4 @@
+import { API_BASE_URL, SOCKET_URL } from '../../lib/api';
 import { useState, useEffect } from 'react'
 import { Loader2, AlertTriangle, TrendingUp, Package, CheckCircle2, LayoutDashboard, Truck, Clock, XCircle, AlertCircle } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
@@ -9,7 +10,7 @@ export default function Analytics() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
-  const backendUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000'
+  const backendUrl = API_BASE_URL;
 
   useEffect(() => {
     const fetchAnalytics = async () => {

@@ -1,3 +1,4 @@
+import { API_BASE_URL, SOCKET_URL } from '../lib/api';
 import { useState, useEffect, useRef } from 'react'
 import { Zap, Volume2, VolumeX, Radio, CheckCircle, AlertCircle, RefreshCw, Sparkles, Monitor } from 'lucide-react'
 
@@ -10,7 +11,7 @@ export default function DeterrentControl() {
   const [triggering, setTriggering] = useState(false)
   const [activeAlert, setActiveAlert] = useState(null)
 
-  const backendUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000'
+  const backendUrl = API_BASE_URL;
 
   useEffect(() => {
     localStorage.setItem('esp32_ip', esp32Ip)

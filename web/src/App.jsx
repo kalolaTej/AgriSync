@@ -15,6 +15,7 @@ import Dashboard from './pages/Dashboard';
 import Alerts from './pages/preharvest/Alerts';
 import Cameras from './pages/Cameras';
 import Detections from './pages/Detections';
+import DetectionDetail from './pages/DetectionDetail';
 import AnimalManagement from './pages/preharvest/AnimalManagement';
 import CropIncidents from './pages/preharvest/CropIncidents';
 import IncidentAnalytics from './pages/preharvest/IncidentAnalytics';
@@ -94,6 +95,16 @@ export const App = () => {
               <ProtectedRoute allowedRoles={['farmer']}>
                 <DashboardLayout>
                   <Detections />
+                </DashboardLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/detections/:id"
+            element={
+              <ProtectedRoute allowedRoles={['farmer']}>
+                <DashboardLayout>
+                  <DetectionDetail />
                 </DashboardLayout>
               </ProtectedRoute>
             }

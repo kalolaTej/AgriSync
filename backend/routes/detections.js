@@ -1,26 +1,32 @@
 const express = require('express');
 const multer = require('multer');
-const authMiddleware = require('../middleware/auth');
-const detectionRateLimiter = require('../middleware/rateLimiter');
 const {
   createDetection,
   getDetections,
   getDetectionById,
+  getFieldCaptures,
+  getSirenCurrentStatus,
+  triggerSirenManual,
 } = require('../controllers/detectionController');
 
-// memory storage for file buffer processing before uploading to supabase
 const upload = multer({
   storage: multer.memoryStorage(),
-  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit
+  limits: { fileSize: 10 * 1024 * 1024 },
 });
 
 const router = express.Router();
 
-// unauthenticated POST endpoint for edge AI camera ingestion with rate limiting
-router.post('/detection', detectionRateLimiter, upload.single('image'), createDetection);
+// Edge AI & Camera Intake
+router.post('/detection', upload.single('image'), createDetection);
+router.post('/detections', upload.single('image'), createDetection);
 
-// GET endpoints for detection logs
+// Detection Logs & Field Captures
 router.get('/detections', getDetections);
 router.get('/detections/:id', getDetectionById);
+router.get('/field-captures', getFieldCaptures);
+
+// Siren Controls & Status
+router.get('/siren/status', getSirenCurrentStatus);
+router.post('/siren/trigger', triggerSirenManual);
 
 module.exports = router;

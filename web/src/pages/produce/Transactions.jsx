@@ -1,3 +1,4 @@
+import { API_BASE_URL, SOCKET_URL } from '../../lib/api';
 import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { Loader2, AlertTriangle, ArrowLeft, Receipt, CheckCircle2, Save } from 'lucide-react'
@@ -19,7 +20,7 @@ export default function Transactions() {
   const [paymentStatus, setPaymentStatus] = useState('')
   const [amount, setAmount] = useState('')
 
-  const backendUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000'
+  const backendUrl = API_BASE_URL;
 
   const canEdit = user?.role === 'procurement_operator' || user?.role === 'admin'
 

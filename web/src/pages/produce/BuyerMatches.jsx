@@ -1,3 +1,4 @@
+import { API_BASE_URL, SOCKET_URL } from '../../lib/api';
 import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { Loader2, AlertTriangle, ArrowLeft, Users, CheckCircle2, ShieldCheck, Check, Save } from 'lucide-react'
@@ -12,7 +13,7 @@ export default function BuyerMatches() {
   const [error, setError] = useState('')
   const [updating, setUpdating] = useState(null) // tracks ID of match being updated
 
-  const backendUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000'
+  const backendUrl = API_BASE_URL;
   const isFarmer = user?.role === 'farmer'
   const isBuyer = user?.role === 'buyer'
 

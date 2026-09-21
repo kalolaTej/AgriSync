@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import { getTranslation, translations } from '../utils/translations';
 
 const AuthContext = createContext(null);
 
@@ -53,22 +54,34 @@ export const MOCK_USERS = {
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(() => {
     const savedAuth = localStorage.getItem('agrisync_auth');
-    if (savedAuth === 'true') {
-      const savedUser = localStorage.getItem('agrisync_user');
-      if (savedUser) {
-        try { return JSON.parse(savedUser); } catch(e) {}
-      }
-      const savedRole = localStorage.getItem('agrisync_role');
-      return MOCK_USERS[savedRole] || MOCK_USERS.public;
+    if (savedAuth === 'false') {
+      return MOCK_USERS.public;
     }
-    return MOCK_USERS.public;
+    const savedUser = localStorage.getItem('agrisync_user');
+    if (savedUser) {
+      try { return JSON.parse(savedUser); } catch(e) {}
+    }
+    const savedRole = localStorage.getItem('agrisync_role');
+    return MOCK_USERS[savedRole] || MOCK_USERS.farmer;
   });
 
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
-    return localStorage.getItem('agrisync_auth') === 'true';
+    return localStorage.getItem('agrisync_auth') !== 'false';
   });
 
-  const [language, setLanguage] = useState('EN');
+  const [language, setLanguageState] = useState(() => {
+    return localStorage.getItem('agrisync_lang') || 'EN';
+  });
+
+  const setLanguage = (newLang) => {
+    const valid = ['EN', 'MR', 'HI'].includes(newLang) ? newLang : 'EN';
+    setLanguageState(valid);
+    localStorage.setItem('agrisync_lang', valid);
+  };
+
+  const t = (key, fallback) => {
+    return getTranslation(language, key, fallback);
+  };
 
   const registerUser = (userData) => {
     const rawMobile = (userData.mobile || '').trim();
@@ -186,8 +199,24 @@ export const AuthProvider = ({ children }) => {
     localStorage.setItem('agrisync_auth', 'false');
   };
 
+  // Provide translated role label helper
+  const getRoleLabel = (roleKey) => {
+    const role = roleKey || user?.role || 'farmer';
+    return t(`role.${role}`, user?.roleLabel || 'Farmer Producer (FPO)');
+  };
+
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated, registerUser, loginUser, logoutUser, language, setLanguage }}>
+    <AuthContext.Provider value={{ 
+      user, 
+      isAuthenticated, 
+      registerUser, 
+      loginUser, 
+      logoutUser, 
+      language, 
+      setLanguage, 
+      t, 
+      getRoleLabel 
+    }}>
       {children}
     </AuthContext.Provider>
   );
@@ -200,3 +229,4 @@ export const useAuth = () => {
   }
   return context;
 };
+

@@ -1,3 +1,4 @@
+import { API_BASE_URL, SOCKET_URL } from '../../lib/api';
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { UploadCloud, CheckCircle2, AlertTriangle, Loader2 } from 'lucide-react'
@@ -20,7 +21,7 @@ export default function CreateLot() {
   const [photos, setPhotos] = useState([])
   const [previews, setPreviews] = useState([])
 
-  const backendUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000'
+  const backendUrl = API_BASE_URL;
 
   useEffect(() => {
     const fetchFarms = async () => {

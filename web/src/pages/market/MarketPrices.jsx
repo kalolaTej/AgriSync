@@ -1,71 +1,57 @@
-import React, { useState, useEffect } from 'react';
+import { API_BASE_URL, SOCKET_URL } from '../../lib/api';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { TrendingUp, RefreshCw, Search, ArrowRight, ShieldCheck, Database } from 'lucide-react';
-
-const FALLBACK_PRICES = [
-  { crop_type: 'Onion', commodity: 'Red Onion (Garwa)', mandi: 'Pimpalgaon APMC', min: '₹1,800', max: '₹2,650', modal_price: 2420, trend: '+5.2%', arrival: '14,200 Qtl', source: 'mock' },
-  { crop_type: 'Onion', commodity: 'Red Onion (Kharif)', mandi: 'Lasalgaon APMC', min: '₹1,750', max: '₹2,580', modal_price: 2380, trend: '+3.8%', arrival: '18,500 Qtl', source: 'mock' },
-  { crop_type: 'Tomato', commodity: 'Tomato (Hybrid)', mandi: 'Pimpalgaon APMC', min: '₹1,200', max: '₹2,100', modal_price: 1850, trend: '+2.4%', arrival: '8,400 Qtl', source: 'mock' },
-  { crop_type: 'Soybean', commodity: 'Soybean (JS-335)', mandi: 'Latur APMC', min: '₹4,100', max: '₹4,750', modal_price: 4520, trend: '+1.1%', arrival: '22,000 Qtl', source: 'mock' },
-  { crop_type: 'Pomegranate', commodity: 'Pomegranate (Bhagwa)', mandi: 'Solapur APMC', min: '₹5,500', max: '₹8,400', modal_price: 7200, trend: 'Stable', arrival: '3,200 Qtl', source: 'mock' },
-  { crop_type: 'Grapes', commodity: 'Grapes (Thomson)', mandi: 'Nashik APMC', min: '₹4,200', max: '₹6,100', modal_price: 5400, trend: '+4.0%', arrival: '5,600 Qtl', source: 'mock' }
-];
+import { TrendingUp, RefreshCw, Search, ArrowRight, ShieldCheck, Database, CheckCircle2, AlertTriangle } from 'lucide-react';
 
 export const MarketPrices = () => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [prices, setPrices] = useState(FALLBACK_PRICES);
+  const [selectedCropFilter, setSelectedCropFilter] = useState('All');
+  const [prices, setPrices] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [dataSource, setDataSource] = useState('mock'); // 'real' | 'mock'
+  const [refreshing, setRefreshing] = useState(false);
+
+  const backendUrl = API_BASE_URL;
+
+  const fetchLivePrices = useCallback(async () => {
+    setLoading(true);
+    try {
+      const url = selectedCropFilter !== 'All'
+        ? `${backendUrl}/api/market-prices?crop=${encodeURIComponent(selectedCropFilter)}&limit=50`
+        : `${backendUrl}/api/market-prices?limit=50`;
+
+      const res = await fetch(url);
+      if (res.ok) {
+        const json = await res.json();
+        const items = Array.isArray(json) ? json : json.data || [];
+        setPrices(items);
+      }
+    } catch (err) {
+      console.warn('Failed to fetch mandi prices:', err);
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  }, [backendUrl, selectedCropFilter]);
 
   useEffect(() => {
-    const fetchLivePrices = async () => {
-      setLoading(true);
-      try {
-        const backendUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-        const res = await fetch(`${backendUrl}/api/prices?crop=onion`);
-        if (res.ok) {
-          const data = await res.json();
-          if (Array.isArray(data) && data.length > 0) {
-            const hasReal = data.some((item) => item.source === 'real');
-            setDataSource(hasReal ? 'real' : 'mock');
-
-            // Map data to display format
-            const mapped = data.map((item, idx) => ({
-              crop_type: item.crop_type,
-              commodity: `${item.crop_type} (${item.variety || 'Mandi Grade'})`,
-              mandi: `${item.market || 'Pimpalgaon'} APMC`,
-              min: `₹${(item.modal_price * 0.85).toFixed(0)}`,
-              max: `₹${(item.modal_price * 1.15).toFixed(0)}`,
-              modal_price: item.modal_price,
-              trend: idx % 2 === 0 ? '+4.2%' : '+2.8%',
-              arrival: `${(Math.random() * 8000 + 6000).toFixed(0)} Qtl`,
-              source: item.source || 'mock'
-            }));
-            setPrices(mapped);
-          } else {
-            setPrices(FALLBACK_PRICES);
-            setDataSource('mock');
-          }
-        } else {
-          setPrices(FALLBACK_PRICES);
-          setDataSource('mock');
-        }
-      } catch {
-        setPrices(FALLBACK_PRICES);
-        setDataSource('mock');
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchLivePrices();
-  }, []);
+  }, [fetchLivePrices]);
 
-  const filtered = prices.filter(
-    (p) =>
-      p.commodity.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      p.mandi.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const handleRefresh = () => {
+    setRefreshing(true);
+    fetchLivePrices();
+  };
+
+  const filtered = prices.filter((p) => {
+    const cropText = (p.crop || p.crop_type || '').toLowerCase();
+    const marketText = (p.market || p.market_name || '').toLowerCase();
+    const stateText = (p.state || '').toLowerCase();
+    const query = searchTerm.toLowerCase().trim();
+
+    return cropText.includes(query) || marketText.includes(query) || stateText.includes(query);
+  });
+
+  const hasLiveGovernmentData = prices.some((p) => p.isLive === true || p.source === 'data.gov.in');
 
   return (
     <div className="space-y-6">
@@ -74,105 +60,151 @@ export const MarketPrices = () => {
         <div>
           <div className="flex items-center gap-2">
             <span className="text-xs font-bold text-[#047857] uppercase tracking-wider">APMC Mandi Intelligence</span>
-            {dataSource === 'real' ? (
-              <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-800 border border-emerald-300">
-                LIVE AGMARKNET DATA
+            {hasLiveGovernmentData ? (
+              <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-800 border border-emerald-300 flex items-center gap-1">
+                <CheckCircle2 size={12} />
+                <span>OFFICIAL data.gov.in REGISTRY ACTIVE</span>
               </span>
             ) : (
-              <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-md bg-amber-100 text-amber-800 border border-amber-300">
-                MOCK / FALLBACK DATA
+              <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-md bg-amber-100 text-amber-800 border border-amber-300 flex items-center gap-1">
+                <AlertTriangle size={12} />
+                <span>MOCK / FALLBACK REGISTRY ACTIVE</span>
               </span>
             )}
           </div>
-          <h1 className="text-2xl font-black text-[#0f172a]">Agmarknet Mandi Market Prices</h1>
+          <h1 className="text-2xl font-black text-[#0f172a] mt-0.5">Agmarknet Mandi Market Prices</h1>
           <p className="text-xs text-slate-600 mt-1">
-            Real-time daily modal rates and arrival metrics synchronized from Agmarknet mandi market registry.
+            Real-time daily modal rates and arrival metrics synchronized from official data.gov.in Agmarknet mandi portal.
           </p>
         </div>
 
-        <div className="w-full sm:w-64">
-          <input
-            type="text"
-            placeholder="Search crop or APMC mandi..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full px-3.5 py-2 bg-white border border-slate-200 rounded-xl text-xs font-semibold text-[#0f172a] outline-none shadow-2xs focus:border-[#047857]"
-          />
+        {/* Search & Refresh Controls */}
+        <div className="flex items-center gap-3">
+          <div className="w-full sm:w-64 relative">
+            <Search className="absolute left-3 top-2.5 text-slate-400" size={14} />
+            <input
+              type="text"
+              placeholder="Search crop or APMC mandi..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-8.5 pr-3 py-2 bg-white border border-slate-200 rounded-xl text-xs font-semibold text-[#0f172a] outline-none shadow-2xs focus:border-[#047857]"
+            />
+          </div>
+
+          <button
+            onClick={handleRefresh}
+            disabled={refreshing}
+            className="p-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-xl text-xs font-bold shadow-2xs transition-colors flex items-center gap-1"
+            title="Refresh latest mandi quotes"
+          >
+            <RefreshCw size={14} className={refreshing ? 'animate-spin text-[#047857]' : ''} />
+            <span className="hidden sm:inline">Refresh</span>
+          </button>
         </div>
       </div>
 
-      {/* Prices Table */}
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
-            <thead>
-              <tr className="bg-[#0f172a] text-[#dcfce7] text-[11px] font-extrabold uppercase tracking-wider">
-                <th className="p-4">Commodity / Variety</th>
-                <th className="p-4">APMC Mandi Yard</th>
-                <th className="p-4">Min Price</th>
-                <th className="p-4">Max Price</th>
-                <th className="p-4">Modal Price</th>
-                <th className="p-4">24h Trend</th>
-                <th className="p-4">Data Provenance</th>
-                <th className="p-4 text-right pr-6">Action</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100 text-xs text-[#0f172a]">
-              {loading ? (
-                <tr>
-                  <td colSpan={8} className="p-8 text-center text-slate-500 font-medium">
-                    Fetching current Agmarknet market rates...
-                  </td>
-                </tr>
-              ) : filtered.length === 0 ? (
-                <tr>
-                  <td colSpan={8} className="p-8 text-center text-slate-500 font-medium">
-                    No commodity records matching your search query.
-                  </td>
-                </tr>
-              ) : (
-                filtered.map((row, i) => {
-                  const isReal = row.source === 'real';
+      {/* Filter Quick Pills */}
+      <div className="flex flex-wrap gap-2 text-xs">
+        {['All', 'Onion', 'Tomato', 'Wheat', 'Soybean', 'Potato', 'Pomegranate', 'Grapes'].map((c) => (
+          <button
+            key={c}
+            onClick={() => setSelectedCropFilter(c)}
+            className={`px-3 py-1.5 rounded-xl font-bold transition-all ${
+              selectedCropFilter === c
+                ? 'bg-[#047857] text-white shadow-xs'
+                : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-50'
+            }`}
+          >
+            {c === 'All' ? 'All Commodities' : c}
+          </button>
+        ))}
+      </div>
 
-                  return (
-                    <tr key={i} className="hover:bg-slate-50 transition-colors font-medium">
-                      <td className="p-4 font-black text-[#0f172a]">{row.commodity}</td>
-                      <td className="p-4 text-slate-600">{row.mandi}</td>
-                      <td className="p-4 font-data-tabular">{row.min}</td>
-                      <td className="p-4 font-data-tabular">{row.max}</td>
-                      <td className="p-4 font-black text-[#047857] font-data-tabular">
-                        ₹{row.modal_price?.toLocaleString('en-IN') || row.modal} / Qtl
-                      </td>
-                      <td className="p-4 font-extrabold text-[#15803d]">{row.trend}</td>
+      {/* Grid of Mandi Prices */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        {loading ? (
+          [1, 2, 3, 4, 5, 6].map((i) => (
+            <div key={i} className="h-44 bg-white rounded-2xl border border-slate-200 p-5 animate-pulse space-y-3">
+              <div className="h-4 bg-slate-200 rounded w-1/3"></div>
+              <div className="h-6 bg-slate-200 rounded w-1/2"></div>
+              <div className="h-10 bg-slate-100 rounded"></div>
+            </div>
+          ))
+        ) : filtered.length === 0 ? (
+          <div className="col-span-full text-center py-16 bg-white rounded-3xl border border-slate-200 text-slate-500 space-y-2">
+            <Search size={32} className="mx-auto text-slate-400" />
+            <p className="font-bold text-sm">No mandi quotes found matching "{searchTerm}"</p>
+            <p className="text-xs text-slate-400">Try searching for Onion, Tomato, Wheat, or Nashik.</p>
+          </div>
+        ) : (
+          filtered.map((item, idx) => {
+            const cropName = item.crop || item.crop_type || 'Commodity';
+            const marketName = item.market || item.market_name || 'APMC Mandi';
+            const stateName = item.state || 'India';
+            const modal = item.modalPrice || item.modal_price || 0;
+            const min = item.minPrice || item.min_price || Math.round(modal * 0.85);
+            const max = item.maxPrice || item.max_price || Math.round(modal * 1.15);
+            const dateStr = item.date || item.price_date || new Date().toISOString().split('T')[0];
+            const isItemLive = item.isLive === true || item.source === 'data.gov.in';
 
-                      {/* Data Provenance Column */}
-                      <td className="p-4">
-                        {isReal ? (
-                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-black border border-emerald-200">
-                            LIVE AGMARKNET DATA
-                          </span>
-                        ) : (
-                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 text-[10px] font-extrabold border border-slate-200">
-                            MOCK / FALLBACK DATA
-                          </span>
-                        )}
-                      </td>
+            return (
+              <div
+                key={idx}
+                className="bg-white rounded-3xl p-5 border border-slate-200 shadow-xs hover:shadow-md transition-all flex flex-col justify-between space-y-4"
+              >
+                <div>
+                  <div className="flex items-center justify-between border-b border-slate-100 pb-2.5">
+                    <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+                      {stateName}
+                    </span>
+                    {isItemLive ? (
+                      <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-black border border-emerald-300 flex items-center gap-1">
+                        <CheckCircle2 size={11} />
+                        <span>LIVE • data.gov.in</span>
+                      </span>
+                    ) : (
+                      <span className="px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 text-[10px] font-black border border-amber-300 flex items-center gap-1" title={item.fallbackReason || 'Demo data'}>
+                        <AlertTriangle size={11} />
+                        <span>⚠ DUMMY DATA</span>
+                      </span>
+                    )}
+                  </div>
 
-                      <td className="p-4 text-right pr-6">
-                        <Link
-                          to="/market/pimpalgaon"
-                          className="px-3 py-1 bg-slate-100 text-[#0f172a] border border-slate-200 rounded-lg text-[11px] font-bold hover:bg-slate-200 transition-colors"
-                        >
-                          View Trends
-                        </Link>
-                      </td>
-                    </tr>
-                  );
-                })
-              )}
-            </tbody>
-          </table>
-        </div>
+                  <div className="mt-3">
+                    <h2 className="text-base font-black text-[#0f172a]">{cropName}</h2>
+                    <p className="text-xs text-slate-600 font-semibold">{marketName}</p>
+                  </div>
+
+                  <div className="mt-3 p-3.5 bg-[#f8fafc] rounded-2xl border border-slate-100 space-y-1">
+                    <div className="flex items-baseline justify-between">
+                      <span className="text-xs text-slate-500 font-bold">Modal Rate:</span>
+                      <span className="text-xl font-black text-[#0f172a] font-data-tabular">
+                        ₹{modal.toLocaleString('en-IN')} <span className="text-xs text-slate-500 font-normal">/ Qtl</span>
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between text-[11px] text-slate-600 pt-1 border-t border-slate-200/60">
+                      <span>Min: <strong className="text-slate-800 font-bold">₹{min.toLocaleString('en-IN')}</strong></span>
+                      <span>Max: <strong className="text-slate-800 font-bold">₹{max.toLocaleString('en-IN')}</strong></span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-xs">
+                  <span className="text-[11px] text-slate-400 font-mono">
+                    Updated: {dateStr}
+                  </span>
+                  <Link
+                    to={`/sell/advisory?crop=${encodeURIComponent(cropName)}&qty=1000`}
+                    className="text-[#047857] hover:text-[#065f46] font-extrabold flex items-center gap-1 hover:underline"
+                  >
+                    <span>Sell Advisory</span>
+                    <ArrowRight size={13} />
+                  </Link>
+                </div>
+              </div>
+            );
+          })
+        )}
       </div>
     </div>
   );

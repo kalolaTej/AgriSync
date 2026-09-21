@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import LanguageSwitcher from '../../components/LanguageSwitcher';
 
 export const PublicPortal = () => {
-  const { isAuthenticated, user, loginUser, registerUser, logoutUser } = useAuth();
+  const { isAuthenticated, user, loginUser, registerUser, logoutUser, t } = useAuth();
   const navigate = useNavigate();
 
   const [loginForm, setLoginForm] = useState({ mobile: '', password: '', role: 'farmer' });
@@ -91,12 +92,6 @@ export const PublicPortal = () => {
 
   return (
     <div className="min-h-screen bg-white text-[#0f172a] font-sans">
-      {/* Top Notification Strip */}
-      <div className="bg-[#0f172a] text-[#dcfce7] py-2 px-4 text-xs text-center font-bold tracking-wide flex items-center justify-center gap-2">
-        <span className="w-2 h-2 rounded-full bg-[#10b981] animate-ping"></span>
-        <span>Kharif 2026 APMC Online Token Allotment Active across 48 Mandis</span>
-      </div>
-
       {/* Main Navigation Bar */}
       <header className="bg-white/90 backdrop-blur-md py-3 px-6 shadow-xs border-b border-[#e2e8f0] sticky top-0 z-50">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
@@ -107,19 +102,19 @@ export const PublicPortal = () => {
                 <span className="text-xl font-extrabold text-[#166534] tracking-tight leading-none">AgriSync</span>
                 <span className="bg-[#dcfce7] text-[#166534] text-[10px] px-1.5 py-0.2 rounded font-bold border border-[#bbf7d0]">INDIA</span>
               </div>
-              <p className="text-[11px] text-slate-500 font-medium mt-0.5">National Mandi & Procurement Platform</p>
+              <p className="text-[11px] text-slate-500 font-medium mt-0.5">{t('hero.nationalMandi', 'National Mandi & Procurement Platform')}</p>
             </div>
           </Link>
 
           <div className="hidden md:flex items-center gap-6 text-xs font-semibold text-slate-700">
-            <a href="#features" className="hover:text-[#047857]">Features</a>
-            <a href="#mandi-rates" className="hover:text-[#047857]">Live Rates</a>
-            <Link to="/how-it-works" className="hover:text-[#047857]">How It Works</Link>
+            <a href="#features" className="hover:text-[#047857]">{t('hero.featuresLink', 'Features')}</a>
+            <Link to="/how-it-works" className="hover:text-[#047857]">{t('hero.howItWorksLink', 'How It Works')}</Link>
           </div>
 
           <div className="flex items-center gap-3">
+            <LanguageSwitcher size="sm" />
             <button onClick={() => handleFocusAuth('login')} className="text-xs bg-[#047857] text-white hover:bg-[#065f46] font-extrabold px-4 py-2 rounded-xl transition-all shadow-md cursor-pointer">
-              Login / Register
+              {t('hero.loginRegisterBtn', 'Login / Register')}
             </button>
           </div>
         </div>
@@ -133,24 +128,24 @@ export const PublicPortal = () => {
           <div className="lg:col-span-7 space-y-6">
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#dcfce7] text-[#166534] border border-[#bbf7d0] text-xs font-bold">
               <span className="w-2 h-2 rounded-full bg-[#047857] animate-pulse"></span>
-              <span>Trusted by 45,000+ Farmers & 12 APMC Mandis</span>
+              <span>{t('hero.badge', 'Trusted by 45,000+ Farmers & 12 APMC Mandis')}</span>
             </div>
 
             <h1 className="text-4xl sm:text-6xl font-black text-[#0f172a] tracking-tight leading-[1.1]">
-              From Farm Protection to <br />
-              <span className="text-[#047857]">Better Selling Decisions.</span>
+              {t('hero.titleLine1', 'From Farm Protection to')} <br />
+              <span className="text-[#047857]">{t('hero.titleLine2', 'Better Selling Decisions.')}</span>
             </h1>
 
             <p className="text-base sm:text-lg text-slate-600 max-w-2xl leading-relaxed">
-              AgriSync connects solar perimeter intrusion defense with real-time APMC mandi slot booking, NIR produce assaying, and direct institutional buyer matching.
+              {t('hero.desc', 'AgriSync connects solar perimeter intrusion defense with real-time APMC mandi slot booking, NIR produce assaying, and direct institutional buyer matching.')}
             </p>
 
             <div className="flex flex-wrap items-center gap-4 pt-2">
               <button onClick={() => handleFocusAuth('login')} className="px-6 py-3.5 rounded-xl bg-[#047857] text-white font-extrabold text-sm hover:bg-[#065f46] shadow-lg transition-all flex items-center gap-2 cursor-pointer">
-                <span className="material-symbols-outlined">login</span> Login to Workspace
+                <span className="material-symbols-outlined">login</span> {t('hero.loginWorkspace', 'Login to Workspace')}
               </button>
               <Link to="/how-it-works" className="px-6 py-3.5 rounded-xl bg-white text-[#0f172a] font-bold text-sm border border-slate-200 hover:bg-slate-50 shadow-xs transition-all flex items-center gap-2">
-                <span className="material-symbols-outlined text-[#047857]">play_circle</span> Explore How It Works
+                <span className="material-symbols-outlined text-[#047857]">play_circle</span> {t('hero.exploreHow', 'Explore How It Works')}
               </Link>
             </div>
           </div>
@@ -164,13 +159,13 @@ export const PublicPortal = () => {
                   onClick={() => handleTabChange('login')}
                   className={`flex-1 py-4 text-sm font-extrabold transition-colors ${activeAuthTab === 'login' ? 'bg-[#f4fbf7] text-[#047857] border-b-2 border-[#047857]' : 'bg-white text-slate-500 hover:text-slate-800'}`}
                 >
-                  Login
+                  {t('auth.loginTab', 'Login')}
                 </button>
                 <button 
                   onClick={() => handleTabChange('register')}
                   className={`flex-1 py-4 text-sm font-extrabold transition-colors ${activeAuthTab === 'register' ? 'bg-[#f4fbf7] text-[#047857] border-b-2 border-[#047857]' : 'bg-white text-slate-500 hover:text-slate-800'}`}
                 >
-                  Register
+                  {t('auth.registerTab', 'Register')}
                 </button>
               </div>
 
@@ -184,61 +179,61 @@ export const PublicPortal = () => {
                       </div>
                     )}
                     <div>
-                      <label className="block font-bold text-slate-700 mb-1">Mobile / Email *</label>
+                      <label className="block font-bold text-slate-700 mb-1">{t('auth.mobileEmail', 'Mobile / Email *')}</label>
                       <input 
                         type="text"
                         value={loginForm.mobile}
                         onChange={(e) => setLoginForm({...loginForm, mobile: e.target.value})}
                         className="w-full px-3.5 py-2.5 bg-[#f8fafc] border border-slate-200 rounded-xl font-semibold text-[#0f172a] outline-none focus:border-[#047857]"
-                        placeholder="Enter registered mobile"
+                        placeholder={t('auth.mobilePlaceholder', 'Enter registered mobile')}
                         required
                       />
                     </div>
                     <div>
-                      <label className="block font-bold text-slate-700 mb-1">Password *</label>
+                      <label className="block font-bold text-slate-700 mb-1">{t('auth.password', 'Password *')}</label>
                       <input 
                         type="password"
                         value={loginForm.password}
                         onChange={(e) => setLoginForm({...loginForm, password: e.target.value})}
                         className="w-full px-3.5 py-2.5 bg-[#f8fafc] border border-slate-200 rounded-xl font-semibold text-[#0f172a] outline-none focus:border-[#047857]"
-                        placeholder="Enter password"
+                        placeholder={t('auth.passwordPlaceholder', 'Enter password')}
                         required
                       />
                     </div>
                     <div>
-                      <label className="block font-bold text-slate-700 mb-1">Role *</label>
+                      <label className="block font-bold text-slate-700 mb-1">{t('auth.role', 'Role *')}</label>
                       <select 
                         value={loginForm.role}
                         onChange={(e) => setLoginForm({...loginForm, role: e.target.value})}
                         className="w-full px-3.5 py-2.5 bg-[#f8fafc] border border-slate-200 rounded-xl font-bold text-[#0f172a] outline-none"
                       >
-                        <option value="farmer">Farmer Producer (FPO)</option>
-                        <option value="apmc">APMC Mandi Official</option>
-                        <option value="buyer">Institutional Buyer</option>
-                        <option value="driver">Logistics Drayage Driver</option>
+                        <option value="farmer">{t('role.farmer', 'Farmer Producer (FPO)')}</option>
+                        <option value="apmc">{t('role.apmc', 'APMC Mandi Official')}</option>
+                        <option value="buyer">{t('role.buyer', 'Institutional Buyer')}</option>
+                        <option value="driver">{t('role.driver', 'Logistics Drayage Driver')}</option>
                       </select>
                     </div>
                     <div className="pt-2">
-                      <button type="submit" className="w-full py-3 bg-[#047857] text-white font-extrabold text-sm rounded-xl hover:bg-[#065f46] shadow-md transition-all">
-                        Login Securely
+                      <button type="submit" className="w-full py-3 bg-[#047857] text-white font-extrabold text-sm rounded-xl hover:bg-[#065f46] shadow-md transition-all cursor-pointer">
+                        {t('auth.loginSecurely', 'Login Securely')}
                       </button>
                     </div>
 
                     {/* Quick Demo Shortcuts */}
                     <div className="pt-3 border-t border-slate-100 mt-3">
-                      <span className="block text-[10px] font-extrabold text-slate-400 uppercase tracking-wider mb-2">⚡ Quick 1-Click Demo Login</span>
+                      <span className="block text-[10px] font-extrabold text-slate-400 uppercase tracking-wider mb-2">{t('auth.quickDemo', '⚡ Quick 1-Click Demo Login')}</span>
                       <div className="grid grid-cols-2 gap-2">
                         <button type="button" onClick={() => handleQuickDemoLogin('farmer')} className="px-2.5 py-1.5 bg-[#dcfce7] text-[#166534] rounded-lg font-extrabold text-[11px] hover:bg-[#bbf7d0] transition-colors border border-[#bbf7d0] text-left">
-                          🌾 Farmer FPO
+                          {t('auth.demoFarmer', '🌾 Farmer FPO')}
                         </button>
                         <button type="button" onClick={() => handleQuickDemoLogin('apmc')} className="px-2.5 py-1.5 bg-slate-100 text-[#0f172a] rounded-lg font-extrabold text-[11px] hover:bg-slate-200 transition-colors border border-slate-200 text-left">
-                          🏢 APMC Mandi
+                          {t('auth.demoApmc', '🏢 APMC Mandi')}
                         </button>
                         <button type="button" onClick={() => handleQuickDemoLogin('buyer')} className="px-2.5 py-1.5 bg-slate-100 text-[#0f172a] rounded-lg font-extrabold text-[11px] hover:bg-slate-200 transition-colors border border-slate-200 text-left">
-                          💼 Buyer Co.
+                          {t('auth.demoBuyer', '💼 Buyer Co.')}
                         </button>
                         <button type="button" onClick={() => handleQuickDemoLogin('driver')} className="px-2.5 py-1.5 bg-slate-100 text-[#0f172a] rounded-lg font-extrabold text-[11px] hover:bg-slate-200 transition-colors border border-slate-200 text-left">
-                          🚛 Drayage Driver
+                          {t('auth.demoDriver', '🚛 Drayage Driver')}
                         </button>
                       </div>
                     </div>
@@ -253,7 +248,7 @@ export const PublicPortal = () => {
                       </div>
                     )}
                     <div>
-                      <label className="block font-bold text-slate-700 mb-1">Full Name / Entity Name *</label>
+                      <label className="block font-bold text-slate-700 mb-1">{t('auth.fullName', 'Full Name / Entity Name *')}</label>
                       <input 
                         type="text"
                         value={registerForm.fullName}
@@ -263,7 +258,7 @@ export const PublicPortal = () => {
                       />
                     </div>
                     <div>
-                      <label className="block font-bold text-slate-700 mb-1">Mobile Number *</label>
+                      <label className="block font-bold text-slate-700 mb-1">{t('auth.mobileNumber', 'Mobile Number *')}</label>
                       <input 
                         type="text"
                         value={registerForm.mobile}
@@ -273,7 +268,7 @@ export const PublicPortal = () => {
                       />
                     </div>
                     <div>
-                      <label className="block font-bold text-slate-700 mb-1">Aadhaar Number (e-KYC)</label>
+                      <label className="block font-bold text-slate-700 mb-1">{t('auth.aadhaar', 'Aadhaar Number (e-KYC)')}</label>
                       <input 
                         type="text"
                         placeholder="e.g. 4589-1234-9810"
@@ -284,7 +279,7 @@ export const PublicPortal = () => {
                     </div>
                     <div className="grid grid-cols-2 gap-2">
                       <div>
-                        <label className="block font-bold text-slate-700 mb-1">Bank A/c Number</label>
+                        <label className="block font-bold text-slate-700 mb-1">{t('auth.bankAccount', 'Bank A/c Number')}</label>
                         <input 
                           type="text"
                           placeholder="e.g. 9100238491823"
@@ -294,7 +289,7 @@ export const PublicPortal = () => {
                         />
                       </div>
                       <div>
-                        <label className="block font-bold text-slate-700 mb-1">Bank IFSC Code</label>
+                        <label className="block font-bold text-slate-700 mb-1">{t('auth.ifsc', 'Bank IFSC Code')}</label>
                         <input 
                           type="text"
                           placeholder="e.g. ICIC0000102"
@@ -305,20 +300,20 @@ export const PublicPortal = () => {
                       </div>
                     </div>
                     <div>
-                      <label className="block font-bold text-slate-700 mb-1">Role *</label>
+                      <label className="block font-bold text-slate-700 mb-1">{t('auth.role', 'Role *')}</label>
                       <select 
                         value={registerForm.role}
                         onChange={(e) => setRegisterForm({...registerForm, role: e.target.value})}
                         className="w-full px-3.5 py-2.5 bg-[#f8fafc] border border-slate-200 rounded-xl font-bold text-[#0f172a] outline-none"
                       >
-                        <option value="farmer">Farmer Producer (FPO)</option>
-                        <option value="apmc">APMC Mandi Official</option>
-                        <option value="buyer">Institutional Buyer</option>
-                        <option value="driver">Logistics Drayage Driver</option>
+                        <option value="farmer">{t('role.farmer', 'Farmer Producer (FPO)')}</option>
+                        <option value="apmc">{t('role.apmc', 'APMC Mandi Official')}</option>
+                        <option value="buyer">{t('role.buyer', 'Institutional Buyer')}</option>
+                        <option value="driver">{t('role.driver', 'Logistics Drayage Driver')}</option>
                       </select>
                     </div>
                     <div>
-                      <label className="block font-bold text-slate-700 mb-1">Create Password *</label>
+                      <label className="block font-bold text-slate-700 mb-1">{t('auth.createPassword', 'Create Password *')}</label>
                       <input 
                         type="password"
                         value={registerForm.password}
@@ -328,8 +323,8 @@ export const PublicPortal = () => {
                       />
                     </div>
                     <div className="pt-2">
-                      <button type="submit" className="w-full py-3 bg-[#0f172a] text-white font-extrabold text-sm rounded-xl hover:bg-[#1e293b] shadow-md transition-all">
-                        Register Now
+                      <button type="submit" className="w-full py-3 bg-[#0f172a] text-white font-extrabold text-sm rounded-xl hover:bg-[#1e293b] shadow-md transition-all cursor-pointer">
+                        {t('auth.registerNow', 'Register Now')}
                       </button>
                     </div>
                   </form>
@@ -345,10 +340,14 @@ export const PublicPortal = () => {
       <section id="features" className="py-16 px-6 bg-white border-t border-slate-100">
         <div className="max-w-7xl mx-auto space-y-12">
           <div className="text-center max-w-3xl mx-auto">
-            <span className="text-xs font-extrabold uppercase tracking-wider text-[#047857] bg-[#dcfce7] px-3.5 py-1 rounded-full border border-[#bbf7d0]">Platform Overview</span>
-            <h2 className="text-3xl sm:text-4xl font-black text-[#0f172a] mt-3">What AgriSync Does For You</h2>
+            <span className="text-xs font-extrabold uppercase tracking-wider text-[#047857] bg-[#dcfce7] px-3.5 py-1 rounded-full border border-[#bbf7d0]">
+              {t('features.badge', 'Platform Overview')}
+            </span>
+            <h2 className="text-3xl sm:text-4xl font-black text-[#0f172a] mt-3">
+              {t('features.title', 'What AgriSync Does For You')}
+            </h2>
             <p className="text-sm text-slate-600 mt-2">
-              AgriSync is an end-to-end digital agritech ecosystem unifying farm security, market intelligence, APMC mandi logistics, quality assaying, and direct bank settlement.
+              {t('features.subtitle', 'AgriSync is an end-to-end digital agritech ecosystem unifying farm security, market intelligence, APMC mandi logistics, quality assaying, and direct bank settlement.')}
             </p>
           </div>
 
@@ -357,9 +356,9 @@ export const PublicPortal = () => {
               <div className="w-12 h-12 rounded-xl bg-[#dcfce7] text-[#047857] flex items-center justify-center">
                 <span className="material-symbols-outlined text-2xl">shield</span>
               </div>
-              <h3 className="font-extrabold text-base text-[#0f172a]">1. AI Farm Intrusion Defense</h3>
+              <h3 className="font-extrabold text-base text-[#0f172a]">{t('features.card1Title', '1. AI Farm Intrusion Defense')}</h3>
               <p className="text-xs text-slate-600 leading-relaxed">
-                Solar-powered cameras with real-time AI animal detection automatically trigger acoustic deterrents and generate evidence logs for PMFBY crop insurance claims.
+                {t('features.card1Desc', 'Solar-powered cameras with real-time AI animal detection automatically trigger acoustic deterrents and generate evidence logs for PMFBY crop insurance claims.')}
               </p>
             </div>
 
@@ -367,9 +366,9 @@ export const PublicPortal = () => {
               <div className="w-12 h-12 rounded-xl bg-[#dcfce7] text-[#047857] flex items-center justify-center">
                 <span className="material-symbols-outlined text-2xl">trending_up</span>
               </div>
-              <h3 className="font-extrabold text-base text-[#0f172a]">2. Smart Selling Advisory</h3>
+              <h3 className="font-extrabold text-base text-[#0f172a]">{t('features.card2Title', '2. Smart Selling Advisory')}</h3>
               <p className="text-xs text-slate-600 leading-relaxed">
-                Analyze price trends across APMC mandis to determine the best 48–72 hour harvest selling window and match with verified institutional buyers.
+                {t('features.card2Desc', 'Analyze price trends across APMC mandis to determine the best 48–72 hour harvest selling window and match with verified institutional buyers.')}
               </p>
             </div>
 
@@ -377,9 +376,9 @@ export const PublicPortal = () => {
               <div className="w-12 h-12 rounded-xl bg-[#dcfce7] text-[#047857] flex items-center justify-center">
                 <span className="material-symbols-outlined text-2xl">qr_code_2</span>
               </div>
-              <h3 className="font-extrabold text-base text-[#0f172a]">3. APMC Mandi Slot Booking</h3>
+              <h3 className="font-extrabold text-base text-[#0f172a]">{t('features.card3Title', '3. APMC Mandi Slot Booking')}</h3>
               <p className="text-xs text-slate-600 leading-relaxed">
-                Reserve arrival slots to skip long yard congestion queues. ANPR camera gate security scans vehicle plates and assigns instant digital entry tokens.
+                {t('features.card3Desc', 'Reserve arrival slots to skip long yard congestion queues. ANPR camera gate security scans vehicle plates and assigns instant digital entry tokens.')}
               </p>
             </div>
 
@@ -387,74 +386,10 @@ export const PublicPortal = () => {
               <div className="w-12 h-12 rounded-xl bg-[#dcfce7] text-[#047857] flex items-center justify-center">
                 <span className="material-symbols-outlined text-2xl">account_balance_wallet</span>
               </div>
-              <h3 className="font-extrabold text-base text-[#0f172a]">4. Instant Escrow DBT Settlement</h3>
+              <h3 className="font-extrabold text-base text-[#0f172a]">{t('features.card4Title', '4. Instant Escrow DBT Settlement')}</h3>
               <p className="text-xs text-slate-600 leading-relaxed">
-                Certified weighbridge & NIR quality assay grading automatically trigger direct escrow payment to the farmer's bank account with zero middleman deductions.
+                {t('features.card4Desc', 'Certified weighbridge & NIR quality assay grading automatically trigger direct escrow payment to the farmer\'s bank account with zero middleman deductions.')}
               </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Live Mandi Rates Section */}
-      <section id="mandi-rates" className="py-16 px-6 bg-[#f4fbf7]">
-        <div className="max-w-7xl mx-auto space-y-8">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div>
-              <span className="text-xs font-extrabold uppercase tracking-wider text-[#047857] bg-[#dcfce7] px-3.5 py-1 rounded-full border border-[#bbf7d0]">Real-Time Market Prices</span>
-              <h2 className="text-3xl font-black text-[#0f172a] mt-2">Live APMC Mandi Rates Benchmark</h2>
-            </div>
-            <span className="text-xs font-bold text-slate-500 bg-white px-3 py-1.5 rounded-lg border border-slate-200 shadow-2xs">Updated: Today 11:30 AM</span>
-          </div>
-
-          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse">
-                <thead>
-                  <tr className="bg-[#0f172a] text-[#dcfce7] text-[11px] font-extrabold uppercase tracking-wider">
-                    <th className="p-4">APMC Mandi Centre</th>
-                    <th className="p-4">Crop Commodity</th>
-                    <th className="p-4">Modal Price (₹/Qtl)</th>
-                    <th className="p-4">Min - Max Range</th>
-                    <th className="p-4">Price Trend</th>
-                    <th className="p-4">Market Status</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100 text-xs text-[#0f172a]">
-                  <tr className="hover:bg-slate-50 font-medium">
-                    <td className="p-4 font-bold">Pimpalgaon APMC Yard #2</td>
-                    <td className="p-4 font-extrabold text-[#047857]">Red Onion (Garwa)</td>
-                    <td className="p-4 font-black font-data-tabular text-sm">₹2,450</td>
-                    <td className="p-4 font-data-tabular">₹2,100 - ₹2,620</td>
-                    <td className="p-4 font-bold text-emerald-600">▲ +3.2% (Up)</td>
-                    <td className="p-4"><span className="px-2.5 py-0.5 rounded-full bg-[#dcfce7] text-[#15803d] text-[10px] font-bold">High Demand</span></td>
-                  </tr>
-                  <tr className="hover:bg-slate-50 font-medium">
-                    <td className="p-4 font-bold">Lasalgaon APMC Yard #1</td>
-                    <td className="p-4 font-extrabold text-[#047857]">Red Onion (FAQ Grade)</td>
-                    <td className="p-4 font-black font-data-tabular text-sm">₹2,620</td>
-                    <td className="p-4 font-data-tabular">₹2,250 - ₹2,780</td>
-                    <td className="p-4 font-bold text-emerald-600">▲ +1.8% (Up)</td>
-                    <td className="p-4"><span className="px-2.5 py-0.5 rounded-full bg-[#dcfce7] text-[#15803d] text-[10px] font-bold">Active Bidding</span></td>
-                  </tr>
-                  <tr className="hover:bg-slate-50 font-medium">
-                    <td className="p-4 font-bold">Nashik Central APMC</td>
-                    <td className="p-4 font-extrabold text-[#047857]">Soybean (JS-335)</td>
-                    <td className="p-4 font-black font-data-tabular text-sm">₹4,850</td>
-                    <td className="p-4 font-data-tabular">₹4,400 - ₹5,100</td>
-                    <td className="p-4 font-bold text-emerald-600">▲ +0.5% (Stable)</td>
-                    <td className="p-4"><span className="px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 text-[10px] font-bold">Normal Arrivals</span></td>
-                  </tr>
-                  <tr className="hover:bg-slate-50 font-medium">
-                    <td className="p-4 font-bold">Yeola APMC Yard</td>
-                    <td className="p-4 font-extrabold text-[#047857]">Pomegranate (Bhagwa)</td>
-                    <td className="p-4 font-black font-data-tabular text-sm">₹8,200</td>
-                    <td className="p-4 font-data-tabular">₹7,000 - ₹9,500</td>
-                    <td className="p-4 font-bold text-emerald-600">▲ +4.1% (Up)</td>
-                    <td className="p-4"><span className="px-2.5 py-0.5 rounded-full bg-[#dcfce7] text-[#15803d] text-[10px] font-bold">Export Grade</span></td>
-                  </tr>
-                </tbody>
-              </table>
             </div>
           </div>
         </div>
@@ -474,35 +409,35 @@ export const PublicPortal = () => {
                 </div>
               </div>
               <p className="text-slate-400 leading-relaxed text-[11px]">
-                National APMC Mandi Slot Allocation, YOLOv8 Crop Perimeter Defense, and Instant Settlement Platform.
+                {t('features.subtitle', 'National APMC Mandi Slot Allocation, YOLOv8 Crop Perimeter Defense, and Instant Settlement Platform.')}
               </p>
             </div>
 
             {/* Col 2: Platform Links */}
             <div>
-              <h4 className="text-white font-bold text-xs mb-3 uppercase tracking-wider">Farmer Operations</h4>
+              <h4 className="text-white font-bold text-xs mb-3 uppercase tracking-wider">{t('nav.overview', 'Farmer Operations')}</h4>
               <ul className="space-y-2 text-[11px]">
-                <li><Link to="/login" className="hover:text-emerald-400 transition-colors">Operations Dashboard</Link></li>
-                <li><Link to="/how-it-works" className="hover:text-emerald-400 transition-colors">How AgriSync Works</Link></li>
-                <li><Link to="/register" className="hover:text-emerald-400 transition-colors">Farmer e-KYC Onboarding</Link></li>
-                <li><a href="#mandi-rates" className="hover:text-emerald-400 transition-colors">Agmarknet Live Mandi Rates</a></li>
+                <li><Link to="/login" className="hover:text-emerald-400 transition-colors">{t('nav.dashboard', 'Operations Dashboard')}</Link></li>
+                <li><Link to="/how-it-works" className="hover:text-emerald-400 transition-colors">{t('nav.howItWorks', 'How AgriSync Works')}</Link></li>
+                <li><Link to="/register" className="hover:text-emerald-400 transition-colors">{t('nav.registerKYC', 'Farmer e-KYC Onboarding')}</Link></li>
+                <li><Link to="/market" className="hover:text-emerald-400 transition-colors">{t('nav.marketPrices', 'Agmarknet Live Mandi Rates')}</Link></li>
               </ul>
             </div>
 
             {/* Col 3: Mandi Services */}
             <div>
-              <h4 className="text-white font-bold text-xs mb-3 uppercase tracking-wider">APMC Mandi Infrastructure</h4>
+              <h4 className="text-white font-bold text-xs mb-3 uppercase tracking-wider">{t('nav.mandiOperations', 'APMC Mandi Infrastructure')}</h4>
               <ul className="space-y-2 text-[11px]">
-                <li><Link to="/login" className="hover:text-emerald-400 transition-colors">Digital Weighbridge Console</Link></li>
-                <li><Link to="/login" className="hover:text-emerald-400 transition-colors">ANPR Automatic Gate-In Queue</Link></li>
-                <li><Link to="/login" className="hover:text-emerald-400 transition-colors">NIR Assayer Quality Grading</Link></li>
-                <li><Link to="/login" className="hover:text-emerald-400 transition-colors">Bank Escrow Fast Settlement</Link></li>
+                <li><Link to="/login" className="hover:text-emerald-400 transition-colors">{t('nav.weighbridge', 'Digital Weighbridge Console')}</Link></li>
+                <li><Link to="/login" className="hover:text-emerald-400 transition-colors">{t('nav.gateSecurity', 'ANPR Automatic Gate-In Queue')}</Link></li>
+                <li><Link to="/login" className="hover:text-emerald-400 transition-colors">{t('nav.qualityAssayer', 'NIR Assayer Quality Grading')}</Link></li>
+                <li><Link to="/login" className="hover:text-emerald-400 transition-colors">{t('nav.transactions', 'Bank Escrow Fast Settlement')}</Link></li>
               </ul>
             </div>
 
             {/* Col 4: Support */}
             <div>
-              <h4 className="text-white font-bold text-xs mb-3 uppercase tracking-wider">Helpdesk & Support</h4>
+              <h4 className="text-white font-bold text-xs mb-3 uppercase tracking-wider">{t('nav.apmcSupport', 'Helpdesk & Support')}</h4>
               <div className="p-3.5 bg-slate-900 rounded-xl border border-slate-800 space-y-1">
                 <span className="text-[10px] text-slate-400 block font-medium">National APMC Kisan Toll-Free</span>
                 <span className="text-emerald-400 font-bold text-base block font-mono">1800 233 4567</span>
@@ -515,7 +450,7 @@ export const PublicPortal = () => {
             <p>© 2026 AgriSync National Platform. All rights reserved under National Agricultural Market standards.</p>
             <div className="flex items-center gap-2 text-[11px] text-emerald-400 font-medium">
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-              <span>All 48 Mandi Gateways Operational</span>
+              <span>{t('dash.allOperational', 'All 48 Mandi Gateways Operational')}</span>
             </div>
           </div>
         </div>
@@ -525,3 +460,4 @@ export const PublicPortal = () => {
 };
 
 export default PublicPortal;
+

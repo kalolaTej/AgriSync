@@ -74,13 +74,18 @@ ACCEPTED_CONTENT_TYPES = {
     "image/webp",
 }
 
+from typing import List, Optional, Dict, Any
+
 # ── response model ───────────────────────────────────────────────────────────
 
 class GradeResponse(BaseModel):
     """Public API response — matches the AgriSync lot grading contract."""
-    grade: str             # "A", "B", or "C"
+    grade: str                         # "A", "B", or "C"
     defect_flags: List[str]
     notes: str
+    quality_score: Optional[float] = None
+    confidence: Optional[float] = None
+    features: Optional[Dict[str, Any]] = None
 
 
 # ── health check ─────────────────────────────────────────────────────────────
@@ -100,11 +105,7 @@ async def grade_produce(image: UploadFile = File(...)):
     Accepts multipart/form-data with field ``image``.
 
     Returns:
-        GradeResponse with grade (A/B/C), defect_flags, and notes.
-
-    Raises:
-        400 — missing, invalid, or corrupted image.
-        500 — unexpected processing error (logged server-side).
+        GradeResponse with grade (A/B/C), defect_flags, notes, quality_score, and features.
     """
     # ── validate presence and content type ────────────────────────────────
     if not image or not image.filename:
@@ -165,4 +166,12 @@ async def grade_produce(image: UploadFile = File(...)):
         grade=result.grade,
         defect_flags=result.defect_flags,
         notes=result.notes,
+        quality_score=round(result.overall_score, 1),
+        confidence=round(max(0.70, min(0.98, result.overall_score / 100)), 2),
+        features={
+            "colorScore": round(result.color_score, 1),
+            "defectScore": round(result.defect_score, 1),
+            "shapeScore": round(result.shape_score, 1),
+            "uniformityScore": round(result.uniformity_score, 1),
+        },
     )

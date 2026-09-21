@@ -1,94 +1,46 @@
+import { API_BASE_URL, SOCKET_URL } from '../lib/api';
 import { useState, useEffect, useCallback } from 'react'
-import { RefreshCw, Filter, CheckCircle2, AlertCircle, Plus, Video, Radio, Layers, ShieldAlert, Sliders, Activity } from 'lucide-react'
+import {
+  RefreshCw,
+  Filter,
+  CheckCircle2,
+  AlertCircle,
+  Plus,
+  Video,
+  Radio,
+  Trash2,
+  Edit,
+  ShieldCheck,
+  Activity,
+  Sliders,
+  Play,
+  Square,
+  Wifi,
+  WifiOff,
+} from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
-import { ANIMAL_IMAGES } from '../lib/animalImages'
+import { getImageUrl, resolveCameraStreamUrl } from '../lib/imageUtils'
 import AddCameraModal from '../components/AddCameraModal'
-
-const STORAGE_KEY = 'agrisync_cameras_v2'
-
-const DEFAULT_SEEDED_CAMERAS = [
-  {
-    id: 'CAM-NORTH-01',
-    name: 'North Perimeter Node #1',
-    farm_name: 'Rajesh Farm (Niphad)',
-    zone: 'North Field - Onion Plot',
-    status: 'online',
-    detection_enabled: true,
-    resolution: '1080p',
-    fps: 30,
-    last_ping: 'Live now (Heartbeat: 4s ago)',
-    last_detection: 'Wild Boar (03:14 AM Today)',
-    source_url: 'rtsp://192.168.1.101:554/live/north_field',
-    preview: ANIMAL_IMAGES.pig
-  },
-  {
-    id: 'CAM-EAST-02',
-    name: 'East Boundary Node #2',
-    farm_name: 'Rajesh Farm (Niphad)',
-    zone: 'East Boundary - Sugarcane',
-    status: 'online',
-    detection_enabled: true,
-    resolution: '1080p',
-    fps: 30,
-    last_ping: 'Live now (Heartbeat: 8s ago)',
-    last_detection: 'Cow / Cattle (Yesterday 11:45 PM)',
-    source_url: 'rtsp://192.168.1.102:554/live/east_sugarcane',
-    preview: ANIMAL_IMAGES.cow
-  },
-  {
-    id: 'CAM-SOUTH-03',
-    name: 'South Canal Node #3',
-    farm_name: 'Rajesh Farm (Niphad)',
-    zone: 'South Canal Perimeter',
-    status: 'online',
-    detection_enabled: true,
-    resolution: '1080p',
-    fps: 30,
-    last_ping: 'Live now (Heartbeat: 12s ago)',
-    last_detection: 'Nilgai (2 days ago)',
-    source_url: 'rtsp://192.168.1.103:554/live/south_canal',
-    preview: ANIMAL_IMAGES.horse
-  },
-  {
-    id: 'CAM-GATE-04',
-    name: 'West Gate Terminal Node #4',
-    farm_name: 'Rajesh Farm (Niphad)',
-    zone: 'Farm Entry Gate',
-    status: 'offline',
-    detection_enabled: false,
-    resolution: '720p',
-    fps: 0,
-    last_ping: 'Offline (No heartbeat)',
-    last_detection: 'No intrusion logged',
-    source_url: 'rtsp://192.168.1.104:554/live/west_gate',
-    preview: ANIMAL_IMAGES.dog
-  }
-]
-
-const loadCustomCameras = () => {
-  try {
-    const data = localStorage.getItem(STORAGE_KEY)
-    if (data) return JSON.parse(data)
-  } catch {}
-  return DEFAULT_SEEDED_CAMERAS
-}
-
-const saveCustomCameras = (cameras) => {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(cameras))
-  } catch {}
-}
 
 export default function Cameras() {
   const { session } = useAuth()
-  const [cameras, setCameras] = useState(() => loadCustomCameras())
+  const [cameras, setCameras] = useState([])
   const [farms, setFarms] = useState([])
   const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
   const [selectedZone, setSelectedZone] = useState('All')
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
+  const [cameraToEdit, setCameraToEdit] = useState(null)
+  const [cameraToDelete, setCameraToDelete] = useState(null)
+  const [deleting, setDeleting] = useState(false)
+  const [actionMessage, setActionMessage] = useState(null)
 
-  const backendUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000'
+  const backendUrl = API_BASE_URL;
+
+  const showNotification = (msg, type = 'success') => {
+    setActionMessage({ text: msg, type })
+    setTimeout(() => setActionMessage(null), 4000)
+  }
 
   const fetchFarms = useCallback(async () => {
     try {
@@ -120,50 +72,12 @@ export default function Cameras() {
           ? data.data
           : Array.isArray(data?.cameras)
           ? data.cameras
-          : null
+          : []
 
-        if (items && items.length > 0) {
-          const apiFormatted = items.map((c, i) => {
-            let isCamOnline = false
-            if (typeof c.status === 'boolean') {
-              isCamOnline = c.status
-            } else if (typeof c.status === 'string') {
-              isCamOnline = c.status.toLowerCase() === 'online' || c.status.toLowerCase() === 'true'
-            } else if (typeof c.status === 'number') {
-              isCamOnline = c.status === 1
-            }
-
-            return {
-              ...c,
-              id: c.id || `CAM-${i+1}`,
-              farm_name: c.farm_name || 'Rajesh Farm (Niphad)',
-              status: isCamOnline ? 'online' : 'offline',
-              detection_enabled: c.detection_enabled !== false,
-              fps: isCamOnline ? (c.fps || 30) : 0,
-              resolution: c.resolution || '1080p',
-              last_ping: c.last_ping || (isCamOnline ? 'Live now (Heartbeat: 5s ago)' : 'No heartbeat signal'),
-              last_detection: c.last_detection || 'Monitoring...',
-              preview: c.preview || Object.values(ANIMAL_IMAGES)[i % Object.values(ANIMAL_IMAGES).length],
-            }
-          })
-
-          setCameras((prev) => {
-            const currentList = prev.length > 0 ? prev : DEFAULT_SEEDED_CAMERAS
-            const seenIds = new Set()
-            const unique = []
-            for (const c of [...apiFormatted, ...currentList]) {
-              if (c && c.id && !seenIds.has(c.id)) {
-                seenIds.add(c.id)
-                unique.push(c)
-              }
-            }
-            saveCustomCameras(unique)
-            return unique
-          })
-        }
+        setCameras(items)
       }
-    } catch {
-      // keep local state
+    } catch (err) {
+      console.error('Failed to fetch cameras:', err)
     } finally {
       setLoading(false)
       setRefreshing(false)
@@ -181,48 +95,97 @@ export default function Cameras() {
   }
 
   const handleCameraAdded = (newCam) => {
-    const isCamOnline = newCam.status === true || newCam.status === 'online'
-    const formatted = {
-      ...newCam,
-      id: newCam.id || `CAM-${Date.now().toString().slice(-4)}`,
-      farm_name: newCam.farm_name || 'Rajesh Farm (Niphad)',
-      status: isCamOnline ? 'online' : 'offline',
-      detection_enabled: true,
-      fps: isCamOnline ? 30 : 0,
-      resolution: '1080p',
-      last_ping: isCamOnline ? 'Live now' : 'Connecting...',
-      last_detection: 'Monitoring...',
-      preview: ANIMAL_IMAGES.cow,
-    }
-
-    setCameras((prev) => {
-      const updated = [formatted, ...prev.filter((c) => c.id !== formatted.id)]
-      saveCustomCameras(updated)
-      return updated
-    })
-    setSelectedZone('All')
+    setCameras((prev) => [newCam, ...prev.filter((c) => c.id !== newCam.id)])
+    showNotification(`Camera "${newCam.name}" added successfully.`)
+    fetchCameras()
   }
 
-  const toggleCameraStatus = async (camId, currentStatus) => {
-    const isCurrentlyOnline = currentStatus === 'online' || currentStatus === true
-    const newStatusStr = isCurrentlyOnline ? 'offline' : 'online'
-    const newStatusBool = !isCurrentlyOnline
+  const handleCameraUpdated = (updatedCam) => {
+    setCameras((prev) => prev.map((c) => (c.id === updatedCam.id ? updatedCam : c)))
+    showNotification(`Camera "${updatedCam.name}" updated successfully.`)
+    setCameraToEdit(null)
+    fetchCameras()
+  }
 
-    setCameras((prev) => {
-      const updated = prev.map((c) => {
+  const handleDeleteCamera = async () => {
+    if (!cameraToDelete) return
+    setDeleting(true)
+
+    try {
+      const headers = {}
+      if (session?.access_token) {
+        headers['Authorization'] = `Bearer ${session.access_token}`
+      }
+
+      const res = await fetch(`${backendUrl}/api/cameras/${cameraToDelete.id}`, {
+        method: 'DELETE',
+        headers,
+      })
+
+      if (res.ok) {
+        setCameras((prev) => prev.filter((c) => c.id !== cameraToDelete.id))
+        showNotification(`Camera "${cameraToDelete.name}" deleted and monitoring stopped.`)
+        setCameraToDelete(null)
+      } else {
+        showNotification('Failed to delete camera', 'error')
+      }
+    } catch (err) {
+      showNotification('Network error while deleting camera', 'error')
+    } finally {
+      setDeleting(false)
+    }
+  }
+
+  const toggleMonitoring = async (camId, currentStatus) => {
+    const newStatus = !currentStatus
+
+    setCameras((prev) =>
+      prev.map((c) => {
         if (c.id === camId) {
           return {
             ...c,
-            status: newStatusStr,
-            fps: newStatusBool ? 30 : 0,
-            last_ping: newStatusBool ? 'Live now (Heartbeat: 2s ago)' : 'Offline (Disconnected)',
+            monitoring_enabled: newStatus,
+            status: newStatus ? 'online' : 'disabled',
+            last_ping: newStatus ? 'Live now' : 'Monitoring Disabled',
           }
         }
         return c
       })
-      saveCustomCameras(updated)
-      return updated
-    })
+    )
+
+    try {
+      const headers = { 'Content-Type': 'application/json' }
+      if (session?.access_token) {
+        headers['Authorization'] = `Bearer ${session.access_token}`
+      }
+      await fetch(`${backendUrl}/api/cameras/${camId}/monitoring`, {
+        method: 'PATCH',
+        headers,
+        body: JSON.stringify({ enabled: newStatus }),
+      })
+      showNotification(`Monitoring ${newStatus ? 'enabled' : 'disabled'}`)
+    } catch {
+      fetchCameras()
+    }
+  }
+
+  const toggleCameraOnlineStatus = async (camId, currentStatus) => {
+    const isOnline = currentStatus === 'online' || currentStatus === true
+    const nextStatus = !isOnline
+
+    setCameras((prev) =>
+      prev.map((c) => {
+        if (c.id === camId) {
+          return {
+            ...c,
+            status: nextStatus ? 'online' : 'offline',
+            fps: nextStatus ? 30 : 0,
+            last_ping: nextStatus ? 'Live now' : 'Offline (Disconnected)',
+          }
+        }
+        return c
+      })
+    )
 
     try {
       const headers = { 'Content-Type': 'application/json' }
@@ -232,58 +195,61 @@ export default function Cameras() {
       await fetch(`${backendUrl}/api/cameras/${camId}/status`, {
         method: 'PATCH',
         headers,
-        body: JSON.stringify({ status: newStatusBool }),
+        body: JSON.stringify({ status: nextStatus }),
       })
-    } catch {}
+    } catch {
+      fetchCameras()
+    }
   }
 
-  const toggleDetectionStatus = (camId) => {
-    setCameras((prev) => {
-      const updated = prev.map((c) => {
-        if (c.id === camId) {
-          return {
-            ...c,
-            detection_enabled: !c.detection_enabled
-          }
-        }
-        return c
-      })
-      saveCustomCameras(updated)
-      return updated
-    })
-  }
+  const zones = ['All', ...new Set(cameras.map((c) => c?.zone).filter(Boolean))]
+  const filteredCameras =
+    selectedZone === 'All' ? cameras : cameras.filter((c) => c?.zone === selectedZone)
 
-  const cameraList = Array.isArray(cameras) && cameras.length > 0 ? cameras : DEFAULT_SEEDED_CAMERAS
-  const zones = ['All', ...new Set(cameraList.map((c) => c?.zone).filter(Boolean))]
-  const filteredCameras = selectedZone === 'All'
-    ? cameraList
-    : cameraList.filter((c) => c?.zone === selectedZone)
-
-  const activeCount = cameraList.filter((c) => c.status === 'online' || c.status === true).length
+  const activeCount = cameras.filter((c) => c.status === 'online' || c.status === true).length
 
   return (
     <div className="space-y-6">
+      {/* Toast notification banner */}
+      {actionMessage && (
+        <div
+          className={`p-3 rounded-xl border text-xs font-bold flex items-center justify-between animate-fade-in ${
+            actionMessage.type === 'error'
+              ? 'bg-red-50 border-red-200 text-red-700'
+              : 'bg-emerald-50 border-emerald-200 text-emerald-800'
+          }`}
+        >
+          <span>{actionMessage.text}</span>
+          <button onClick={() => setActionMessage(null)} className="text-slate-400 hover:text-slate-600">
+            ×
+          </button>
+        </div>
+      )}
+
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-200">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-black text-[#0f172a] tracking-tight">Perimeter Camera Nodes & IoT Sensors</h1>
+            <h1 className="text-2xl font-black text-[#0f172a] tracking-tight">Perimeter Camera Management & IoT Nodes</h1>
             <span className="text-xs font-extrabold px-2.5 py-0.5 rounded-full bg-[#dcfce7] text-[#15803d] border border-[#bbf7d0]">
-              {activeCount} / {cameraList.length} Active Nodes
+              {activeCount} / {cameras.length} Active Nodes
             </span>
           </div>
           <p className="text-xs text-slate-600 mt-1 font-medium">
-            Live edge camera telemetry, detection zone routing, and RTSP stream status connected to YOLO11n AI inference.
+            Live edge IP cameras, RTSP streams, multi-camera health monitoring, and YOLO11n intrusion detection pipeline.
           </p>
         </div>
 
         <div className="flex items-center gap-2.5 self-start sm:self-auto">
           <button
-            onClick={() => setIsAddModalOpen(true)}
+            onClick={() => {
+              setCameraToEdit(null)
+              setIsAddModalOpen(true)
+            }}
             className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#047857] hover:bg-[#065f46] text-white text-xs font-extrabold transition-all shadow-md cursor-pointer active:scale-95"
           >
             <Plus size={15} />
-            <span>+ Add Camera Node</span>
+            <span>+ Add IP Camera</span>
           </button>
 
           <button
@@ -319,135 +285,226 @@ export default function Cameras() {
         </div>
       )}
 
-      {/* Camera Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {filteredCameras.map((cam, idx) => {
-          const isOnline = cam?.status === 'online' || cam?.status === true
-          const isDetectionOn = cam?.detection_enabled !== false
+      {/* Loading state */}
+      {loading ? (
+        <div className="flex items-center justify-center py-20 bg-white rounded-2xl border border-slate-200">
+          <RefreshCw className="w-8 h-8 animate-spin text-[#047857]" />
+          <span className="ml-3 text-xs font-bold text-slate-600">Loading camera nodes from database...</span>
+        </div>
+      ) : filteredCameras.length === 0 ? (
+        <div className="text-center py-16 bg-white rounded-2xl border border-slate-200 p-8 space-y-4">
+          <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center mx-auto text-slate-400">
+            <Video size={24} />
+          </div>
+          <div>
+            <h3 className="font-extrabold text-slate-800 text-base">No Cameras Found</h3>
+            <p className="text-xs text-slate-500 max-w-sm mx-auto mt-1">
+              Add your first IP camera with RTSP or HTTP stream URL to begin automatic intrusion monitoring.
+            </p>
+          </div>
+          <button
+            onClick={() => setIsAddModalOpen(true)}
+            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#047857] text-white text-xs font-bold shadow-md cursor-pointer"
+          >
+            <Plus size={14} />
+            <span>Add Camera Now</span>
+          </button>
+        </div>
+      ) : (
+        /* Camera Grid */
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {filteredCameras.map((cam, idx) => {
+            const isOnline = cam?.status === 'online' || cam?.status === true
+            const isMonitoringOn = cam?.monitoring_enabled !== false
 
-          return (
-            <div
-              key={cam?.id || idx}
-              className="bg-white rounded-2xl border border-slate-200 shadow-xs hover:shadow-md transition-shadow overflow-hidden flex flex-col justify-between"
-            >
-              <div>
-                {/* Stream Preview Header */}
-                <div className="relative h-48 bg-slate-950 flex items-center justify-center overflow-hidden">
-                  <img
-                    src={cam?.preview || ANIMAL_IMAGES.cow}
-                    alt={cam?.name || 'Camera Stream'}
-                    className={`w-full h-full object-cover transition-opacity ${
-                      isOnline ? 'opacity-85 hover:opacity-100' : 'opacity-30 grayscale'
-                    }`}
-                  />
-
-                  {/* Overlay Badges */}
-                  <div className="absolute top-3 left-3 flex items-center gap-2">
-                    <span className="bg-black/70 backdrop-blur-xs text-white text-[10px] font-extrabold px-2.5 py-0.5 rounded flex items-center gap-1 border border-white/20">
-                      <Video size={12} className={isOnline ? 'text-[#34d399]' : 'text-slate-400'} />
-                      {cam?.resolution || '1080p'} • {cam?.fps || 0} FPS
-                    </span>
-                    <span className="bg-[#047857]/90 text-white text-[9px] font-extrabold px-2 py-0.5 rounded uppercase tracking-wider">
-                      CAMERA SIMULATION
-                    </span>
-                  </div>
-
-                  {/* Online/Offline Toggle Button */}
-                  <div className="absolute top-3 right-3">
-                    <button
-                      onClick={() => toggleCameraStatus(cam.id, cam.status)}
-                      title="Toggle Camera Node Online/Offline"
-                      className={`inline-flex items-center gap-1.5 text-[11px] font-extrabold px-3 py-1 rounded-full transition-transform active:scale-95 cursor-pointer shadow-md ${
-                        isOnline
-                          ? 'bg-[#dcfce7] text-[#15803d] border border-[#bbf7d0]'
-                          : 'bg-slate-800 text-slate-300 border border-slate-700'
+            return (
+              <div
+                key={cam?.id || idx}
+                className="bg-white rounded-2xl border border-slate-200 shadow-xs hover:shadow-md transition-shadow overflow-hidden flex flex-col justify-between"
+              >
+                <div>
+                  {/* Stream Preview Header */}
+                  <div className="relative h-48 bg-slate-950 flex items-center justify-center overflow-hidden">
+                    <img
+                      src={resolveCameraStreamUrl(cam)}
+                      alt={cam?.name || 'Camera Stream'}
+                      className={`w-full h-full object-cover transition-opacity ${
+                        isOnline ? 'opacity-90 hover:opacity-100' : 'opacity-30 grayscale'
                       }`}
-                    >
-                      <span className={`w-2 h-2 rounded-full ${isOnline ? 'bg-[#15803d] animate-pulse' : 'bg-slate-400'}`}></span>
-                      {isOnline ? 'ONLINE' : 'OFFLINE'}
-                    </button>
-                  </div>
+                      onError={(e) => {
+                        e.currentTarget.src = ANIMAL_IMAGES.cow
+                      }}
+                    />
 
-                  {/* Stream URL footer overlay */}
-                  {cam?.source_url && (
-                    <div className="absolute bottom-2 left-2 right-2 bg-black/60 backdrop-blur-xs px-2.5 py-1 rounded text-[10px] font-mono text-slate-300 truncate flex items-center gap-1.5">
-                      <Radio size={11} className={isOnline ? 'text-[#34d399]' : 'text-slate-500'} />
-                      <span className="truncate">{cam.source_url}</span>
-                    </div>
-                  )}
-                </div>
-
-                {/* Camera Information Details */}
-                <div className="p-5 space-y-4">
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <h3 className="font-black text-base text-[#0f172a]">{cam?.name || 'Perimeter Camera Node'}</h3>
-                      <p className="text-xs text-[#047857] font-bold mt-0.5">
-                        Zone: {cam?.zone || 'North Field - Onion Plot'}
-                      </p>
-                      <p className="text-[11px] text-slate-500 font-medium">
-                        Farm: {cam?.farm_name || 'Rajesh Farm (Niphad)'} • Node ID: <span className="font-mono">{cam?.id}</span>
-                      </p>
+                    {/* Overlay Badges */}
+                    <div className="absolute top-3 left-3 flex items-center gap-2">
+                      <span className="bg-black/70 backdrop-blur-xs text-white text-[10px] font-extrabold px-2.5 py-0.5 rounded flex items-center gap-1 border border-white/20">
+                        <Video size={12} className={isOnline ? 'text-[#34d399]' : 'text-slate-400'} />
+                        {cam?.camera_type || 'RTSP'} • {cam?.resolution || '1080p'} • {cam?.fps || 0} FPS
+                      </span>
+                      {cam?.purpose && (
+                        <span className="bg-[#047857]/90 text-white text-[9px] font-extrabold px-2 py-0.5 rounded uppercase tracking-wider">
+                          {cam.purpose}
+                        </span>
+                      )}
                     </div>
 
-                    {/* Detection Switch */}
-                    <div className="text-right">
-                      <span className="text-[10px] text-slate-500 font-bold block mb-1">AI Detection</span>
+                    {/* Online/Offline Toggle Button */}
+                    <div className="absolute top-3 right-3 flex items-center gap-1.5">
                       <button
-                        onClick={() => toggleDetectionStatus(cam.id)}
-                        className={`text-[10px] font-extrabold px-2.5 py-1 rounded-lg border transition-all cursor-pointer ${
-                          isDetectionOn
-                            ? 'bg-[#dcfce7] text-[#15803d] border-[#bbf7d0]'
-                            : 'bg-slate-100 text-slate-600 border-slate-200'
+                        onClick={() => toggleCameraOnlineStatus(cam.id, cam.status)}
+                        title="Toggle Camera Node Online/Offline"
+                        className={`inline-flex items-center gap-1.5 text-[11px] font-extrabold px-3 py-1 rounded-full transition-transform active:scale-95 cursor-pointer shadow-md ${
+                          isOnline
+                            ? 'bg-[#dcfce7] text-[#15803d] border border-[#bbf7d0]'
+                            : 'bg-slate-800 text-slate-300 border border-slate-700'
                         }`}
                       >
-                        {isDetectionOn ? '✓ ENABLED' : '✕ MUTED'}
+                        <span className={`w-2 h-2 rounded-full ${isOnline ? 'bg-[#15803d] animate-pulse' : 'bg-slate-400'}`}></span>
+                        {isOnline ? 'ONLINE' : 'OFFLINE'}
                       </button>
                     </div>
+
+                    {/* Stream URL footer overlay */}
+                    {cam?.source_url && (
+                      <div className="absolute bottom-2 left-2 right-2 bg-black/60 backdrop-blur-xs px-2.5 py-1 rounded text-[10px] font-mono text-slate-300 truncate flex items-center gap-1.5">
+                        <Radio size={11} className={isOnline ? 'text-[#34d399]' : 'text-slate-500'} />
+                        <span className="truncate">{cam.source_url}</span>
+                      </div>
+                    )}
                   </div>
 
-                  <div className="grid grid-cols-2 gap-3 pt-3 border-t border-slate-100 text-xs">
-                    <div>
-                      <span className="text-[10px] text-slate-400 font-bold block uppercase">Telemetry Heartbeat</span>
-                      <span className="font-bold text-[#0f172a] text-[11px] flex items-center gap-1 mt-0.5">
-                        <Activity size={12} className={isOnline ? 'text-[#047857]' : 'text-slate-400'} />
-                        {cam?.last_ping || 'Active'}
-                      </span>
+                  {/* Camera Information Details */}
+                  <div className="p-5 space-y-4">
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <h3 className="font-black text-base text-[#0f172a]">{cam?.name || 'Perimeter Camera Node'}</h3>
+                        <p className="text-xs text-[#047857] font-bold mt-0.5">
+                          Zone: {cam?.zone || 'North Field - Onion Plot'}
+                        </p>
+                        <p className="text-[11px] text-slate-500 font-medium">
+                          IP: <span className="font-mono">{cam?.ip || '192.168.1.105'}:{cam?.port || 554}</span> • Node ID: <span className="font-mono">{cam?.id}</span>
+                        </p>
+                      </div>
+
+                      {/* Monitoring Toggle */}
+                      <div className="text-right">
+                        <span className="text-[10px] text-slate-500 font-bold block mb-1">AI Monitoring</span>
+                        <button
+                          onClick={() => toggleMonitoring(cam.id, isMonitoringOn)}
+                          className={`text-[10px] font-extrabold px-2.5 py-1 rounded-lg border transition-all cursor-pointer ${
+                            isMonitoringOn
+                              ? 'bg-[#dcfce7] text-[#15803d] border-[#bbf7d0]'
+                              : 'bg-slate-100 text-slate-600 border-slate-200'
+                          }`}
+                        >
+                          {isMonitoringOn ? '✓ ACTIVE' : '✕ DISABLED'}
+                        </button>
+                      </div>
                     </div>
-                    <div>
-                      <span className="text-[10px] text-slate-400 font-bold block uppercase">Last Incident</span>
-                      <span className="font-semibold text-slate-700 text-[11px] truncate block mt-0.5">
-                        {cam?.last_detection || 'Monitoring...'}
-                      </span>
+
+                    <div className="grid grid-cols-2 gap-3 pt-3 border-t border-slate-100 text-xs">
+                      <div>
+                        <span className="text-[10px] text-slate-400 font-bold block uppercase">Telemetry Heartbeat</span>
+                        <span className="font-bold text-[#0f172a] text-[11px] flex items-center gap-1 mt-0.5">
+                          <Activity size={12} className={isOnline ? 'text-[#047857]' : 'text-slate-400'} />
+                          {cam?.last_ping || 'Active'}
+                        </span>
+                      </div>
+                      <div>
+                        <span className="text-[10px] text-slate-400 font-bold block uppercase">Assigned Field</span>
+                        <span className="font-semibold text-slate-700 text-[11px] truncate block mt-0.5">
+                          {cam?.zone || 'North Field - Onion Plot'}
+                        </span>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
 
-              {/* Status Footer */}
-              <div className="px-5 py-3 bg-slate-50 border-t border-slate-100 flex items-center justify-between text-xs text-slate-600">
-                <span className="flex items-center gap-1.5 font-bold">
-                  {isOnline ? (
-                    <CheckCircle2 size={14} className="text-[#15803d]" />
-                  ) : (
-                    <AlertCircle size={14} className="text-red-500" />
-                  )}
-                  {isOnline ? 'RTSP Signal Synchronized' : 'Stream Standby (Click Online to Connect)'}
-                </span>
-                <span className="text-[10px] font-mono text-slate-400">{cam?.resolution} 30FPS</span>
-              </div>
-            </div>
-          )
-        })}
-      </div>
+                {/* Card Action Footer: Edit, Delete, Status */}
+                <div className="px-5 py-3 bg-slate-50 border-t border-slate-100 flex items-center justify-between text-xs text-slate-600">
+                  <span className="flex items-center gap-1.5 font-bold">
+                    {isOnline ? (
+                      <CheckCircle2 size={14} className="text-[#15803d]" />
+                    ) : (
+                      <AlertCircle size={14} className="text-red-500" />
+                    )}
+                    {isOnline ? 'Stream Synchronized' : 'Offline (Click Online to Connect)'}
+                  </span>
 
-      {/* Add Camera Modal */}
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => {
+                        setCameraToEdit(cam)
+                        setIsAddModalOpen(true)
+                      }}
+                      className="p-1.5 rounded-lg text-slate-600 hover:bg-slate-200 hover:text-slate-900 transition-colors cursor-pointer"
+                      title="Edit Camera"
+                    >
+                      <Edit size={14} />
+                    </button>
+                    <button
+                      onClick={() => setCameraToDelete(cam)}
+                      className="p-1.5 rounded-lg text-red-500 hover:bg-red-50 hover:text-red-700 transition-colors cursor-pointer"
+                      title="Delete Camera"
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      )}
+
+      {/* Add / Edit Camera Modal */}
       <AddCameraModal
         isOpen={isAddModalOpen}
-        onClose={() => setIsAddModalOpen(false)}
+        onClose={() => {
+          setIsAddModalOpen(false)
+          setCameraToEdit(null)
+        }}
         onCameraAdded={handleCameraAdded}
+        onCameraUpdated={handleCameraUpdated}
+        cameraToEdit={cameraToEdit}
         farms={farms}
       />
+
+      {/* Delete Confirmation Modal */}
+      {cameraToDelete && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-fade-in">
+          <div className="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl border border-slate-200 space-y-4">
+            <div className="w-10 h-10 rounded-full bg-red-100 text-red-600 flex items-center justify-center">
+              <Trash2 size={20} />
+            </div>
+            <div>
+              <h3 className="font-extrabold text-[#0f172a] text-base">Delete Camera Node</h3>
+              <p className="text-xs text-slate-500 mt-1">
+                Are you sure you want to delete <strong className="text-slate-700">{cameraToDelete.name}</strong>? Monitoring will be stopped. Historical detections will remain saved for audits.
+              </p>
+            </div>
+            <div className="flex items-center justify-end gap-2.5 pt-2">
+              <button
+                type="button"
+                onClick={() => setCameraToDelete(null)}
+                className="px-4 py-2 rounded-xl border border-slate-200 text-slate-600 text-xs font-bold hover:bg-slate-100 cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleDeleteCamera}
+                disabled={deleting}
+                className="px-4 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold shadow-md cursor-pointer disabled:opacity-60 flex items-center gap-1.5"
+              >
+                {deleting && <RefreshCw size={12} className="animate-spin" />}
+                <span>Delete</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

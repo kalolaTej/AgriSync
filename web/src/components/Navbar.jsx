@@ -1,9 +1,10 @@
 import React from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import LanguageSwitcher from './LanguageSwitcher';
 
 export const Navbar = () => {
-  const { user, logoutUser, language, setLanguage } = useAuth();
+  const { user, logoutUser, getRoleLabel, t } = useAuth();
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -18,31 +19,12 @@ export const Navbar = () => {
         {/* Active Role Pill (Read-Only) */}
         <div className="flex items-center gap-2 bg-[#dcfce7] px-3 py-1.5 rounded-lg text-xs border border-[#bbf7d0] shadow-2xs">
           <span className="material-symbols-outlined text-base text-[#166534]">badge</span>
-          <span className="font-extrabold text-[#166534]">Active Role:</span>
-          <span className="text-[#047857] font-bold">{user.roleLabel}</span>
+          <span className="font-extrabold text-[#166534]">{t('nav.activeRole', 'Active Role')}:</span>
+          <span className="text-[#047857] font-bold">{getRoleLabel(user?.role)}</span>
         </div>
 
         {/* Language Switcher */}
-        <div className="flex items-center bg-[#f0fdf4] rounded-lg p-0.5 text-xs border border-[#dcfce7]">
-          <button 
-            onClick={() => setLanguage('EN')} 
-            className={`px-2.5 py-1 font-bold rounded-md transition-colors ${language === 'EN' ? 'bg-[#047857] text-white shadow-xs' : 'text-[#166534] hover:bg-[#dcfce7]'}`}
-          >
-            EN
-          </button>
-          <button 
-            onClick={() => setLanguage('MR')} 
-            className={`px-2.5 py-1 font-bold rounded-md transition-colors ${language === 'MR' ? 'bg-[#047857] text-white shadow-xs' : 'text-[#166534] hover:bg-[#dcfce7]'}`}
-          >
-            मराठी
-          </button>
-          <button 
-            onClick={() => setLanguage('HI')} 
-            className={`px-2.5 py-1 font-bold rounded-md transition-colors ${language === 'HI' ? 'bg-[#047857] text-white shadow-xs' : 'text-[#166534] hover:bg-[#dcfce7]'}`}
-          >
-            हिन्दी
-          </button>
-        </div>
+        <LanguageSwitcher />
       </div>
 
       {/* Action Controls & User Profile */}
@@ -54,7 +36,7 @@ export const Navbar = () => {
             className="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#dcfce7] text-[#047857] hover:bg-[#bbf7d0] font-extrabold text-xs transition-colors border border-[#bbf7d0]"
           >
             <span className="material-symbols-outlined text-sm">local_shipping</span>
-            <span>+ Gate-In Entry</span>
+            <span>{t('nav.gateInEntry', '+ Gate-In Entry')}</span>
           </button>
         )}
 
@@ -78,7 +60,7 @@ export const Navbar = () => {
 
           <button 
             onClick={handleLogout}
-            title="Log out of account"
+            title={t('nav.logout', 'Log out of account')}
             className="p-1.5 text-slate-400 hover:text-red-600 rounded-lg hover:bg-red-50 transition-colors"
           >
             <span className="material-symbols-outlined text-lg">logout</span>
@@ -90,3 +72,4 @@ export const Navbar = () => {
 };
 
 export default Navbar;
+

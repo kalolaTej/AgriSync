@@ -1,3 +1,4 @@
+import { API_BASE_URL, SOCKET_URL } from '../lib/api';
 import { useState, useEffect, useCallback } from 'react'
 import { Link } from 'react-router-dom'
 import { Radio, ShieldAlert, ChevronRight, Clock, MapPin, Video, Eye } from 'lucide-react'
@@ -33,7 +34,7 @@ export default function LiveDetections() {
   }
 
   const fetchInitialDetections = useCallback(async () => {
-    const backendUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000'
+    const backendUrl = API_BASE_URL;
     try {
       const headers = {}
       if (session?.access_token) {

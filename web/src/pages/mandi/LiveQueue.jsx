@@ -1,3 +1,4 @@
+import { API_BASE_URL, SOCKET_URL } from '../../lib/api';
 import React, { useState, useEffect } from 'react';
 import { Truck, CheckCircle2, Clock, PlayCircle, ShieldCheck, ArrowRight, RefreshCw, AlertCircle } from 'lucide-react';
 
@@ -122,7 +123,7 @@ export const LiveQueue = () => {
 
     try {
       // 1. Try existing backend endpoint: PATCH /api/bookings/:id/advance
-      const backendUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+      const backendUrl = API_BASE_URL;
       const tokenAuth = localStorage.getItem('agrisync_token');
 
       const res = await fetch(`${backendUrl}/api/bookings/${tokenId}/advance`, {

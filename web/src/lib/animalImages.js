@@ -19,6 +19,8 @@ export const ANIMAL_IMAGES = {
   fallback: 'https://images.pexels.com/photos/422218/pexels-photo-422218.jpeg?auto=compress&cs=tinysrgb&w=800'
 }
 
+import { API_BASE_URL } from './api';
+
 export function getAnimalImage(animalName, providedUrl) {
   if (
     providedUrl &&
@@ -26,8 +28,19 @@ export function getAnimalImage(animalName, providedUrl) {
     providedUrl.trim().length > 5 &&
     !providedUrl.includes('placeholder.co')
   ) {
-    return providedUrl
+    const trimmed = providedUrl.trim()
+    if (
+      trimmed.startsWith('http://') ||
+      trimmed.startsWith('https://') ||
+      trimmed.startsWith('data:') ||
+      trimmed.startsWith('blob:')
+    ) {
+      return trimmed
+    }
+    const cleanPath = trimmed.startsWith('/') ? trimmed : `/${trimmed}`
+    return API_BASE_URL ? `${API_BASE_URL}${cleanPath}` : cleanPath
   }
-  const key = (animalName || '').toLowerCase().trim()
-  return ANIMAL_IMAGES[key] || ANIMAL_IMAGES.cow
+  const key = (animalName || '').toLowerCase().trim().replace(/[\s-]/g, '_')
+  return ANIMAL_IMAGES[key] || ANIMAL_IMAGES[animalName?.toLowerCase()] || ANIMAL_IMAGES.cow
 }
+

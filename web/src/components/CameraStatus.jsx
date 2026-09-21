@@ -1,7 +1,8 @@
+import { API_BASE_URL, SOCKET_URL } from '../lib/api';
 import { useEffect, useState, useCallback } from 'react'
 import { Camera, RefreshCw, CheckCircle2, AlertCircle, ShieldAlert } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
-import { ANIMAL_IMAGES } from '../lib/animalImages'
+import { getImageUrl, resolveCameraStreamUrl } from '../lib/imageUtils'
 
 export default function CameraStatus() {
   const { session } = useAuth()
@@ -10,7 +11,7 @@ export default function CameraStatus() {
   const [refreshing, setRefreshing] = useState(false)
 
   const fetchCameras = useCallback(async () => {
-    const backendUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000'
+    const backendUrl = API_BASE_URL;
     try {
       const headers = {}
       if (session?.access_token) {
@@ -113,14 +114,13 @@ export default function CameraStatus() {
                 {/* camera stream preview header */}
                 <div className="relative h-28 bg-stone-900 overflow-hidden flex items-center justify-center">
                   <img
-                    src={cam?.preview || ANIMAL_IMAGES.cow}
-                    alt={cam?.name || 'Camera'}
-                    referrerPolicy="no-referrer"
+                    src={resolveCameraStreamUrl(cam)}
+                    alt={cam?.name || 'Camera Preview'}
                     className={`w-full h-full object-cover transition-opacity ${
                       isOnline ? 'opacity-80 hover:opacity-95' : 'opacity-35 grayscale'
                     }`}
                     onError={(e) => {
-                      e.currentTarget.src = ANIMAL_IMAGES.cow
+                      e.currentTarget.src = '/uploads/detections/sample_wild_boar.jpg'
                     }}
                   />
                   <div className="absolute top-2.5 left-2.5 bg-black/60 backdrop-blur-xs text-white text-[10px] font-bold px-2 py-0.5 rounded">

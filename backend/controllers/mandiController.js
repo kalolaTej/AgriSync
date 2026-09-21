@@ -1,21 +1,26 @@
-// ============================================================================
-// Phase 5: Mandi Price Intelligence API (Truthful Fallback)
-//
-// This controller correctly implements the required graceful degradation
-// when no live AGMARKNET/data.gov.in credentials or integrations are present.
-// It DOES NOT fabricate prices, forecasts, or AI predictions.
-// ============================================================================
+const { getMandiPrices } = require('../services/agmarknetService');
 
 exports.getMandiPrices = async (req, res) => {
-  // In a production environment, this is where we would check process.env.AGMARKNET_API_KEY
-  // or fetch from an external service.
-  // Since no live integration exists, we return the truthful unavailable state.
-
   try {
+    const { crop, state, district, market, limit } = req.query;
+    const prices = await getMandiPrices({
+      crop,
+      state,
+      district,
+      market,
+      limit: parseInt(limit, 10) || 50,
+    });
+
+    const isLive = prices.some((p) => p.isLive);
+    const isCached = prices.some((p) => p.isCached);
+
     return res.status(200).json({
-      available: false,
-      source: null,
-      message: "Live mandi price data is not configured. External market integration credentials are required."
+      success: true,
+      available: true,
+      source: isLive ? 'data.gov.in' : (isCached ? 'data.gov.in (Cached)' : 'labeled_fallback'),
+      isLive,
+      count: prices.length,
+      data: prices,
     });
   } catch (error) {
     console.error('Error in mandi price endpoint:', error);

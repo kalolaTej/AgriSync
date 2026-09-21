@@ -1,3 +1,4 @@
+import { API_BASE_URL, SOCKET_URL } from '../../lib/api';
 import React, { useState, useEffect } from 'react';
 import { ShieldAlert, ShieldCheck, Volume2, AlertTriangle, CheckCircle2, Sliders, RefreshCw } from 'lucide-react';
 import { ANIMAL_IMAGES } from '../../lib/animalImages';
@@ -46,7 +47,7 @@ export const AnimalManagement = () => {
   useEffect(() => {
     const fetchBackendDetections = async () => {
       try {
-        const backendUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+        const backendUrl = API_BASE_URL;
         const res = await fetch(`${backendUrl}/api/detections?limit=50`);
         if (res.ok) {
           const data = await res.json();

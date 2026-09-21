@@ -1,3 +1,4 @@
+import { API_BASE_URL, SOCKET_URL } from '../../lib/api';
 import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { Loader2, AlertTriangle, ArrowLeft, Image as ImageIcon, CheckCircle2, ShieldCheck } from 'lucide-react'
@@ -11,7 +12,7 @@ export default function LotDetail() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
-  const backendUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000'
+  const backendUrl = API_BASE_URL;
 
   useEffect(() => {
     const fetchLot = async () => {

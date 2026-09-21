@@ -1,3 +1,4 @@
+import { API_BASE_URL, SOCKET_URL } from '../../lib/api';
 import React, { useState, useEffect } from 'react';
 import { Shield, AlertCircle, CheckCircle2, Eye, Plus, Filter, ShieldAlert, FileText, Check } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
@@ -96,7 +97,7 @@ export const CropIncidents = () => {
   useEffect(() => {
     const fetchBackendIncidents = async () => {
       try {
-        const backendUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+        const backendUrl = API_BASE_URL;
         const headers = {};
         if (session?.access_token) {
           headers['Authorization'] = `Bearer ${session.access_token}`;
@@ -202,7 +203,7 @@ export const CropIncidents = () => {
 
     // Attempt pushing to backend POST /api/incidents
     try {
-      const backendUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+      const backendUrl = API_BASE_URL;
       const headers = { 'Content-Type': 'application/json' };
       if (session?.access_token) {
         headers['Authorization'] = `Bearer ${session.access_token}`;

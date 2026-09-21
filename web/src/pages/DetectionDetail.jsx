@@ -1,3 +1,4 @@
+import { API_BASE_URL, SOCKET_URL } from '../lib/api';
 import { useState, useEffect, useCallback } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { ArrowLeft, MapPin, Camera, Clock, ShieldAlert, Volume2, Check, Download, ExternalLink } from 'lucide-react'
@@ -14,7 +15,7 @@ export default function DetectionDetail() {
   const [sirenToast, setSirenToast] = useState(null)
 
   const fetchDetail = useCallback(async () => {
-    const backendUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000'
+    const backendUrl = API_BASE_URL;
     try {
       const headers = {}
       if (session?.access_token) {

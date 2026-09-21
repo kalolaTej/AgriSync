@@ -1,3 +1,4 @@
+import { API_BASE_URL, SOCKET_URL } from '../../lib/api';
 import React, { useState, useEffect } from 'react';
 import { Warehouse, CheckCircle2, AlertCircle, Building2, MapPin, Calendar, FileText, Download } from 'lucide-react';
 import { generateSlipPDF } from '../../utils/pdfGenerator';
@@ -91,7 +92,7 @@ export const StorageDiscovery = () => {
     const fetchFacilities = async () => {
       setLoading(true);
       try {
-        const backendUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+        const backendUrl = API_BASE_URL;
         const res = await fetch(`${backendUrl}/api/logistics/facilities`);
         if (res.ok) {
           const data = await res.json();

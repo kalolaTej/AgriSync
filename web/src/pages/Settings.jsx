@@ -1,3 +1,4 @@
+import { API_BASE_URL, SOCKET_URL } from '../lib/api';
 import { useState, useEffect } from 'react'
 import { Save, Sliders, Bell, Video } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
@@ -15,7 +16,7 @@ export default function Settings() {
 
   useEffect(() => {
     const fetchSettings = async () => {
-      const backendUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000'
+      const backendUrl = API_BASE_URL;
       try {
         const headers = {}
         if (session?.access_token) {
@@ -45,7 +46,7 @@ export default function Settings() {
   const handleSave = async (e) => {
     e.preventDefault()
     setSaving(true)
-    const backendUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000'
+    const backendUrl = API_BASE_URL;
 
     const payload = {
       confidenceThreshold: confThresh,

@@ -1,3 +1,4 @@
+import { API_BASE_URL, SOCKET_URL } from '../../lib/api';
 import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { Loader2, AlertTriangle, ArrowLeft, Plus, Clock, Info, CheckCircle2 } from 'lucide-react'
@@ -204,7 +205,7 @@ export default function Incidents() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
-  const backendUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000'
+  const backendUrl = API_BASE_URL;
 
   const fetchIncidents = async () => {
     try {
@@ -232,7 +233,7 @@ export default function Incidents() {
     fetchIncidents()
     
     // Setup Socket.io for realtime updates
-    const socket = io(backendUrl)
+    const socket = io(SOCKET_URL || backendUrl || (typeof window !== 'undefined' ? window.location.origin : ''))
     
     socket.on('incident-updated', (payload) => {
       if (payload && payload.lot_id === id) {

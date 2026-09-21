@@ -1,3 +1,4 @@
+import { API_BASE_URL, SOCKET_URL } from '../../lib/api';
 import { useState, useEffect } from 'react'
 import { Loader2, AlertTriangle, TrendingUp, Filter, CheckCircle2 } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
@@ -10,7 +11,7 @@ export default function MandiPrices() {
   const [unavailable, setUnavailable] = useState(false)
   const [unavailableMessage, setUnavailableMessage] = useState('')
 
-  const backendUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000'
+  const backendUrl = API_BASE_URL;
 
   useEffect(() => {
     const fetchPrices = async () => {

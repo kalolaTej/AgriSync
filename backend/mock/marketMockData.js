@@ -118,6 +118,25 @@ const MOCK_MANDI_PRICES = [
   { crop_type: 'Bitter gourd', market_name: 'Azadpur Mandi', state: 'Delhi', min_price: 2850, max_price: 3450, modal_price: 3200, price_date: getPastDate(0), source: 'mock' },
   { crop_type: 'Bitter gourd', market_name: 'Varanasi APMC', state: 'Uttar Pradesh', min_price: 2500, max_price: 3050, modal_price: 2800, price_date: getPastDate(0), source: 'mock' },
 
+  // --- GRAPES (Across 8 Mandis & 5 States) ---
+  { crop_type: 'Grapes', market_name: 'Nashik APMC', state: 'Maharashtra', min_price: 6800, max_price: 8500, modal_price: 7600, price_date: getPastDate(0), source: 'mock' },
+  { crop_type: 'Grapes', market_name: 'Pimpalgaon APMC', state: 'Maharashtra', min_price: 7000, max_price: 8800, modal_price: 7900, price_date: getPastDate(0), source: 'mock' },
+  { crop_type: 'Grapes', market_name: 'Sangli APMC', state: 'Maharashtra', min_price: 6500, max_price: 8200, modal_price: 7400, price_date: getPastDate(0), source: 'mock' },
+  { crop_type: 'Grapes', market_name: 'Pune APMC', state: 'Maharashtra', min_price: 7200, max_price: 9000, modal_price: 8100, price_date: getPastDate(0), source: 'mock' },
+  { crop_type: 'Grapes', market_name: 'Bangalore APMC', state: 'Karnataka', min_price: 7400, max_price: 9200, modal_price: 8300, price_date: getPastDate(0), source: 'mock' },
+  { crop_type: 'Grapes', market_name: 'Azadpur Mandi', state: 'Delhi', min_price: 8500, max_price: 10500, modal_price: 9500, price_date: getPastDate(0), source: 'mock' },
+  { crop_type: 'Grapes', market_name: 'Ahmedabad APMC', state: 'Gujarat', min_price: 7500, max_price: 9300, modal_price: 8400, price_date: getPastDate(0), source: 'mock' },
+  { crop_type: 'Grapes', market_name: 'Bowenpally APMC', state: 'Telangana', min_price: 7800, max_price: 9600, modal_price: 8700, price_date: getPastDate(0), source: 'mock' },
+
+  // --- POMEGRANATE (Across 7 Mandis & 4 States) ---
+  { crop_type: 'Pomegranate', market_name: 'Yeola APMC', state: 'Maharashtra', min_price: 7500, max_price: 9800, modal_price: 8600, price_date: getPastDate(0), source: 'mock' },
+  { crop_type: 'Pomegranate', market_name: 'Solapur APMC', state: 'Maharashtra', min_price: 7800, max_price: 10200, modal_price: 9000, price_date: getPastDate(0), source: 'mock' },
+  { crop_type: 'Pomegranate', market_name: 'Nashik APMC', state: 'Maharashtra', min_price: 7600, max_price: 9900, modal_price: 8750, price_date: getPastDate(0), source: 'mock' },
+  { crop_type: 'Pomegranate', market_name: 'Ahmednagar APMC', state: 'Maharashtra', min_price: 7400, max_price: 9600, modal_price: 8500, price_date: getPastDate(0), source: 'mock' },
+  { crop_type: 'Pomegranate', market_name: 'Gondal APMC', state: 'Gujarat', min_price: 8000, max_price: 10500, modal_price: 9200, price_date: getPastDate(0), source: 'mock' },
+  { crop_type: 'Pomegranate', market_name: 'Azadpur Mandi', state: 'Delhi', min_price: 9500, max_price: 12500, modal_price: 11000, price_date: getPastDate(0), source: 'mock' },
+  { crop_type: 'Pomegranate', market_name: 'Bangalore APMC', state: 'Karnataka', min_price: 8200, max_price: 10800, modal_price: 9500, price_date: getPastDate(0), source: 'mock' },
+
   // --- BAJRA (Across 5 Mandis & 4 States) ---
   { crop_type: 'Bajra(Pearl Millet/Cumbu)', market_name: 'Jaipur APMC', state: 'Rajasthan', min_price: 2200, max_price: 2480, modal_price: 2350, price_date: getPastDate(0), source: 'mock' },
   { crop_type: 'Bajra(Pearl Millet/Cumbu)', market_name: 'Jodhpur APMC', state: 'Rajasthan', min_price: 2150, max_price: 2420, modal_price: 2300, price_date: getPastDate(0), source: 'mock' },
@@ -183,6 +202,22 @@ const MOCK_PRICE_TRENDS = {
     { price_date: getPastDate(7), modal_price: 7320, source: 'mock' },
     { price_date: getPastDate(4), modal_price: 7360, source: 'mock' },
     { price_date: getPastDate(0), modal_price: 7400, source: 'mock' },
+  ],
+  Grapes: [
+    { price_date: getPastDate(14), modal_price: 7100, source: 'mock' },
+    { price_date: getPastDate(10), modal_price: 7300, source: 'mock' },
+    { price_date: getPastDate(7), modal_price: 7450, source: 'mock' },
+    { price_date: getPastDate(4), modal_price: 7600, source: 'mock' },
+    { price_date: getPastDate(2), modal_price: 7750, source: 'mock' },
+    { price_date: getPastDate(0), modal_price: 7900, source: 'mock' },
+  ],
+  Pomegranate: [
+    { price_date: getPastDate(14), modal_price: 8100, source: 'mock' },
+    { price_date: getPastDate(10), modal_price: 8300, source: 'mock' },
+    { price_date: getPastDate(7), modal_price: 8450, source: 'mock' },
+    { price_date: getPastDate(4), modal_price: 8600, source: 'mock' },
+    { price_date: getPastDate(2), modal_price: 8750, source: 'mock' },
+    { price_date: getPastDate(0), modal_price: 8900, source: 'mock' },
   ],
 };
 

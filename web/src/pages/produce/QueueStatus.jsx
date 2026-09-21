@@ -1,3 +1,4 @@
+import { API_BASE_URL, SOCKET_URL } from '../../lib/api';
 import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { Loader2, AlertTriangle, ArrowLeft, Clock, Activity, CheckCircle2, XCircle } from 'lucide-react'
@@ -12,7 +13,7 @@ export default function QueueStatus() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
-  const backendUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000'
+  const backendUrl = API_BASE_URL;
 
   const fetchQueue = async () => {
     try {
@@ -41,7 +42,7 @@ export default function QueueStatus() {
     fetchQueue()
     
     // Socket.io Realtime Integration
-    const socket = io(backendUrl)
+    const socket = io(SOCKET_URL || backendUrl || (typeof window !== 'undefined' ? window.location.origin : ''))
     
     socket.on('connect', () => {
       console.log('Connected to realtime queue updates')

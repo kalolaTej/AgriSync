@@ -1,5 +1,7 @@
+import { API_BASE_URL, SOCKET_URL } from '../lib/api';
 import { useState, useEffect, useCallback } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
+import { io } from 'socket.io-client'
 import { Filter, Calendar, Camera, ChevronRight, RefreshCw, Search, ShieldCheck } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import { getAnimalImage, ANIMAL_IMAGES } from '../lib/animalImages'
@@ -7,42 +9,29 @@ import { getAnimalImage, ANIMAL_IMAGES } from '../lib/animalImages'
 const DEFAULT_DEMO_DETECTIONS = [
   {
     id: 'DET-2026-091',
-    animal: 'pig',
-    camera_id: 'CAM-NORTH-01',
-    camera_name: 'North Perimeter Node #1',
+    animal: 'wild_boar',
+    camera_id: 'cam_01',
+    camera_name: 'North Perimeter Cam',
     farm_name: 'Rajesh Farm (Niphad)',
     zone: 'North Field - Onion Plot',
-    confidence: null,
-    source: 'demo',
+    confidence: 92,
+    source: 'live',
     status: 'Alert Dispatched',
     detected_at: new Date(Date.now() - 1000 * 60 * 18).toISOString(),
-    image_url: ''
+    image_url: '/uploads/detections/sample_wild_boar.jpg'
   },
   {
     id: 'DET-2026-088',
     animal: 'cow',
-    camera_id: 'CAM-EAST-02',
-    camera_name: 'East Boundary Node #2',
+    camera_id: 'cam_02',
+    camera_name: 'East Boundary Cam',
     farm_name: 'Rajesh Farm (Niphad)',
     zone: 'East Boundary - Sugarcane',
-    confidence: null,
-    source: 'demo',
+    confidence: 88,
+    source: 'live',
     status: 'Resolved',
     detected_at: new Date(Date.now() - 1000 * 60 * 85).toISOString(),
-    image_url: ''
-  },
-  {
-    id: 'DET-2026-074',
-    animal: 'horse',
-    camera_id: 'CAM-SOUTH-03',
-    camera_name: 'South Canal Node #3',
-    farm_name: 'Rajesh Farm (Niphad)',
-    zone: 'South Canal Perimeter',
-    confidence: null,
-    source: 'demo',
-    status: 'Logged',
-    detected_at: new Date(Date.now() - 1000 * 60 * 320).toISOString(),
-    image_url: ''
+    image_url: '/uploads/detections/sample_cow.jpg'
   }
 ];
 
@@ -59,10 +48,10 @@ export default function Detections() {
   const [searchQuery, setSearchQuery] = useState(initialSearch)
   const [page, setPage] = useState(1)
   const [hasMore, setHasMore] = useState(false)
-  const limit = 10
+  const limit = 15
 
   const fetchDetections = useCallback(async () => {
-    const backendUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000'
+    const backendUrl = API_BASE_URL;
     try {
       const headers = {}
       if (session?.access_token) {
@@ -107,6 +96,19 @@ export default function Detections() {
 
   useEffect(() => {
     fetchDetections()
+
+    const backendUrl = API_BASE_URL;
+    const socket = io(SOCKET_URL || backendUrl || (typeof window !== 'undefined' ? window.location.origin : ''), { transports: ['websocket', 'polling'] })
+
+    socket.on('new-detection', (newDet) => {
+      if (newDet) {
+        setDetections((prev) => [newDet, ...prev.filter((d) => d.id !== newDet.id)])
+      }
+    })
+
+    return () => {
+      socket.disconnect()
+    }
   }, [fetchDetections])
 
   const detectionList = Array.isArray(detections) ? detections : []

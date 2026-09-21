@@ -1,3 +1,4 @@
+import { API_BASE_URL, SOCKET_URL } from '../../lib/api';
 import React, { useState, useEffect } from 'react';
 import { Shield, Video, AlertTriangle, Activity, CheckCircle2, RefreshCw, BarChart2, Eye } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -24,7 +25,7 @@ export const IncidentAnalytics = () => {
   const fetchBackendData = async () => {
     setRefreshing(true);
     try {
-      const backendUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+      const backendUrl = API_BASE_URL;
       const [camRes, detRes, incRes] = await Promise.allSettled([
         fetch(`${backendUrl}/api/cameras`),
         fetch(`${backendUrl}/api/detections?limit=10`),

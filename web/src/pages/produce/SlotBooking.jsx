@@ -1,3 +1,4 @@
+import { API_BASE_URL, SOCKET_URL } from '../../lib/api';
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { Loader2, AlertTriangle, Calendar, Clock, ArrowLeft, CheckCircle2 } from 'lucide-react'
@@ -16,7 +17,7 @@ export default function SlotBooking() {
   const [selectedLotId, setSelectedLotId] = useState('')
   const [bookingSlotId, setBookingSlotId] = useState(null)
   
-  const backendUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000'
+  const backendUrl = API_BASE_URL;
 
   const fetchData = async () => {
     try {

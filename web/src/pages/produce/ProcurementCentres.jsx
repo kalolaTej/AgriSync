@@ -1,3 +1,4 @@
+import { API_BASE_URL, SOCKET_URL } from '../../lib/api';
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { MapPin, Loader2, AlertTriangle, Building, ArrowRight } from 'lucide-react'
@@ -10,7 +11,7 @@ export default function ProcurementCentres() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
-  const backendUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000'
+  const backendUrl = API_BASE_URL;
 
   useEffect(() => {
     const fetchCentres = async () => {

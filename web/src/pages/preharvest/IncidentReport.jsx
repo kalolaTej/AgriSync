@@ -1,3 +1,4 @@
+import { API_BASE_URL, SOCKET_URL } from '../../lib/api';
 import { useState, useEffect, useCallback } from 'react'
 import { AlertCircle, CheckCircle2, FileText, Plus, RefreshCw, Calendar, MapPin, Tag, ShieldAlert } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
@@ -21,7 +22,7 @@ export default function IncidentReport() {
   const [affectedArea, setAffectedArea] = useState('')
   const [notes, setNotes] = useState('')
 
-  const backendUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000'
+  const backendUrl = API_BASE_URL;
 
   const fetchFarms = useCallback(async () => {
     try {

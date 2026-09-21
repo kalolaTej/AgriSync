@@ -1,3 +1,4 @@
+import { API_BASE_URL, SOCKET_URL } from '../lib/api';
 import { useState, useEffect, useCallback } from 'react'
 import { AlertTriangle, CheckCircle2, Volume2, Filter, ShieldCheck, VolumeX } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
@@ -17,7 +18,7 @@ export default function Alerts() {
   const [sirenActiveToast, setSirenActiveToast] = useState(null)
 
   const fetchAlerts = useCallback(async () => {
-    const backendUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000'
+    const backendUrl = API_BASE_URL;
     try {
       const headers = {}
       if (session?.access_token) {
@@ -61,11 +62,11 @@ export default function Alerts() {
     }, 3500)
 
     // 3. Trigger backend ESP32 hardware controller if available
-    const backendUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000'
-    fetch(`${backendUrl}/api/detection`, {
+    const backendUrl = API_BASE_URL;
+    fetch(`${backendUrl}/api/siren/trigger`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ animal: animalName || 'unknown', duration: 5000 }),
+      body: JSON.stringify({ animal: animalName || 'wild_boar', force: true }),
     }).catch(() => { })
   }
 

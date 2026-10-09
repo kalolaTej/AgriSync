@@ -1,36 +1,13 @@
 # 🌾 AgriSync — Unified Agricultural Protection & Market Platform
 
-[![SIH 2026](https://img.shields.io/badge/SIH_2026-Problem_SIH26193-forestgreen?style=for-the-badge)](https://github.com/kalolaTej/SIH26193)
-[![Build Status](https://img.shields.io/badge/Build-Passing-brightgreen?style=for-the-badge&logo=vite)](https://github.com/kalolaTej/SIH26193)
-[![Tests](https://img.shields.io/badge/Tests-31%2F31%20Passed-success?style=for-the-badge&logo=node.js)](https://github.com/kalolaTej/SIH26193)
-[![React 19](https://img.shields.io/badge/Frontend-React_19_+_Vite-61DAFB?style=for-the-badge&logo=react)](https://github.com/kalolaTej/SIH26193)
-[![Express](https://img.shields.io/badge/Backend-Node.js_+_Express-339933?style=for-the-badge&logo=express)](https://github.com/kalolaTej/SIH26193)
-[![YOLOv8](https://img.shields.io/badge/AI_Vision-Ultralytics_YOLOv8-FF6F00?style=for-the-badge&logo=python)](https://github.com/kalolaTej/SIH26193)
-[![OpenCV](https://img.shields.io/badge/CV_Grading-FastAPI_+_OpenCV-5C3EE8?style=for-the-badge&logo=opencv)](https://github.com/kalolaTej/SIH26193)
-[![ESP32](https://img.shields.io/badge/IoT_Hardware-ESP32_+_Wokwi-E7352C?style=for-the-badge&logo=espressif)](https://github.com/kalolaTej/SIH26193)
+
 
 > **"Guard the Harvest. Value the Yield. Synchronize the Market."**
 > An end-to-end national agricultural intelligence platform unifying **Pre-Harvest Wildlife Intrusion Defense**, **Classical CV Produce Quality Grading**, **APMC Mandi Yard Automation**, and **Dynamic Agmarknet Market Intelligence**.
 
 ---
 
-## 📑 Table of Contents
 
-- [Platform Overview](#-platform-overview)
-- [System Architecture](#-system-architecture)
-- [Core Workflows & Key Modules](#-core-workflows--key-modules)
-  - [1. Pre-Harvest Intrusion Defense & IoT Deterrent](#1-pre-harvest-intrusion-defense--iot-deterrent)
-  - [2. APMC Mandi Yard Operations](#2-apmc-mandi-yard-operations)
-  - [3. Classical CV Produce Grading Microservice](#3-classical-cv-produce-grading-microservice)
-  - [4. Market Intelligence & Selling Window Advisory](#4-market-intelligence--selling-window-advisory)
-  - [5. Fulfillment, Warehousing & Settlement](#5-fulfillment-warehousing--settlement)
-- [Repository Structure](#-repository-structure)
-- [Technology Stack](#-technology-stack)
-- [Quick Start & Local Setup](#-quick-start--local-setup)
-- [Offline / Demo Mode Simulation](#-offline--demo-mode-simulation)
-- [API Reference](#-api-reference)
-- [Testing & Quality Assurance](#-testing--quality-assurance)
-- [License & Acknowledgements](#-license--acknowledgements)
 
 ---
 
@@ -106,80 +83,7 @@ flowchart TD
 
 ---
 
-## 📂 Repository Structure
 
-```text
-SIH26193/
-├── index.html                           # AgriSync Master 23-Screen Interactive Layout Launcher
-├── README.md                            # Comprehensive Platform Documentation
-├── INTEGRATION.md                       # Subsystem Integration & Role-Aware Routing Matrix
-├── diagram.json                         # Root Wokwi ESP32 Circuit Specification
-├── wokwi.toml                           # Root Wokwi Simulation Configuration
-├── platformio.ini                       # PlatformIO Embedded Build Configuration
-│
-├── ai/                                  # Pre-Harvest AI Vision & Deterrent Controller
-│   ├── config.py                        # Stream sources, YOLO thresholds, and camera configs
-│   ├── detect.py                        # YOLOv8 live frame inference & event ingestion
-│   ├── esp32_controller.py              # HTTP & serial deterrent dispatch to IoT hardware
-│   ├── generate_test_video.py           # Automated test video synthesizer for YOLO
-│   ├── test_send_detection.py           # Edge ingestion mock script
-│   ├── requirements.txt                 # Python dependencies (ultralytics, opencv, requests)
-│   └── test_video/cows.mp4              # Sample inference video for offline demo
-│
-├── esp32/                               # IoT Deterrent Firmware (Production & Simulation)
-│   ├── diagram.json                     # Hardware wiring diagram (ESP32, Buzzer, Strobe, UART)
-│   ├── wokwi.toml                       # Simulator environment settings
-│   ├── sketch.ino                       # Wokwi simulation deterrent sketch
-│   └── esp32_deterrent/
-│       └── esp32_deterrent.ino          # Production ESP32 firmware with DFPlayer & LEDC PWM
-│
-├── grading-service/                     # Classical OpenCV Produce Grading Microservice
-│   ├── main.py                          # FastAPI service endpoints (POST /grade)
-│   ├── grading.py                       # Classical OpenCV image processing pipeline
-│   ├── test_grade.py                    # Grading pipeline unit test suite
-│   ├── requirements.txt                 # Dependencies (fastapi, uvicorn, opencv-python, numpy)
-│   └── README.md                        # Microservice technical documentation
-│
-├── backend/                             # Core REST API & Socket.IO Real-Time Server
-│   ├── server.js                        # Express server bootstrapping & route mounting
-│   ├── package.json                     # Node.js backend manifest & scripts
-│   ├── schema.sql                       # Complete PostgreSQL / Supabase relational schema
-│   ├── controllers/                     # 13 controllers handling all business logic
-│   ├── database/
-│   │   ├── localStore.js                # Resilient offline/demo fallback storage engine
-│   │   └── agrisync_store.json          # Seed state for offline zero-failure demonstration
-│   ├── middleware/                      # Auth, RBAC (requireRole), error handling, rate limiting
-│   ├── migrations/                      # 6 SQL database migration scripts (001-004)
-│   ├── routes/                          # 14 REST route modules
-│   ├── services/                        # Agmarknet API, Matching algorithms, Supabase client
-│   └── test/
-│       └── marketIntelligence.test.js   # 31/31 Automated assertion test suite
-│
-├── web/                                 # Modern Frontend Web Application
-│   ├── index.html                       # HTML5 entrypoint
-│   ├── vite.config.js                   # Vite 5 configuration with React plugin
-│   ├── tailwind.config.js               # Tailored AgriSync design system & color tokens
-│   ├── package.json                     # Frontend dependencies (React 19, Lucide, Tailwind)
-│   └── src/
-│       ├── App.jsx                      # Role-aware routing & navigation layout shell
-│       ├── main.jsx                     # React root bootstrap
-│       ├── index.css                    # Design system tokens & utility classes
-│       ├── components/                  # Reusable UI cards, charts, modals, deterrent controls
-│       ├── context/AuthContext.jsx      # Role-based authentication & session provider
-│       └── pages/
-│           ├── preharvest/              # Animal Management, Intrusion History, Crop Damage
-│           ├── mandi/                   # Live FIFO Queue, Gate Kiosk, Weighbridge, Assayer
-│           ├── produce/                 # Produce Batches & Lot Management
-│           ├── sell/                    # Selling Advisory & Buyer Matching
-│           ├── market/                  # Agmarknet Mandi Prices & APMC Yard Profiles
-│           ├── fulfillment/             # Cold Storage, Rural Transport, Settlements
-│           ├── driver/                  # Fast-Track QR Driver Gate Pass
-│           ├── buyer/                   # Institutional Buyer Bids & Contracts
-│           ├── public/                  # Public Portal, Explainer ("How It Works"), e-KYC
-│           └── settings/                # Farm Profile & Parameter Settings
-│
-└── layout/layout/                       # Master 23-Screen Design System & HTML Mockups
-```
 
 ---
 
@@ -311,54 +215,6 @@ AgriSync incorporates an automated **LocalStore Fallback Engine** (`backend/data
 
 ---
 
-## 🧪 Testing & Quality Assurance
-
-AgriSync includes an automated end-to-end integration test suite verifying market pricing, fallback logic, selling advisory models, buyer matchmaking, and logistics engines.
-
-To execute the test suite:
-```bash
-cd backend
-node test/marketIntelligence.test.js
-```
-
-### Verified Test Assertions (31/31 Passing):
-```text
-✅ PASS: GET /api/prices returns 200
-✅ PASS: GET /api/prices returns non-empty array
-✅ PASS: Price record has crop_type, modal_price, and source
-✅ PASS: Price record source is strictly "real" or "mock"
-✅ PASS: GET /api/prices with missing crop returns 200
-✅ PASS: Fallback returns mock records for missing crop
-✅ PASS: Missing crop fallback is clearly labeled source: "mock"
-✅ PASS: GET /api/prices/trend returns 200
-✅ PASS: Price trend returns array of time-series records
-✅ PASS: Trend record matches schema: price_date, modal_price, source
-✅ PASS: GET /api/lots/:id/sale-window returns 200
-✅ PASS: Sale window returns correct lot_id
-✅ PASS: Sale window recommendation is "sell_now" or "hold"
-✅ PASS: Sale window provides plain-language rationale
-✅ PASS: POST /api/buyer-profile returns 201 Created
-✅ PASS: Created buyer profile contains id and crop_type
-✅ PASS: GET /api/lots/:id/matches returns 200
-✅ PASS: Lot matches returns an array
-✅ PASS: Lot match contains buyer_id and numeric match_score
-✅ PASS: Lot match status is valid
-✅ PASS: GET /api/buyers/:id/matches returns 200
-✅ PASS: Buyer matches returns an array
-✅ PASS: Buyer match has lot_id and match_score
-✅ PASS: PATCH /api/matches/:id returns 200
-✅ PASS: Match status updated to "interested"
-✅ PASS: GET /api/lots/:id/logistics-suggestion returns 200
-✅ PASS: Logistics returns recommended facility
-✅ PASS: Logistics returns alternatives array
-✅ PASS: Recommended facility includes plain reason
-✅ PASS: GET /api/logistics/facilities returns 200
-✅ PASS: Logistics facilities list returns seeded facilities
-
---- Test Results: 31 Passed, 0 Failed ---
-```
-
----
 
 ## 👥 The AgriSync Team
 
@@ -372,7 +228,3 @@ Developed with pride for **Smart India Hackathon (SIH 2026)**.
 | **Vashishth Baraiya** | Full-Stack Integration, Role-Aware Routing, Navigation & UI System |
 
 ---
-
-## 📄 License
-
-This project is licensed under the **MIT License** — see the [LICENSE](LICENSE) file for details.
